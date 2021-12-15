@@ -19,5 +19,5 @@ For build instructions see file: *build_info.txt*
 | Weight/Filtering | Weighting and filtering for FDK based reconstruction. Support of RAM and Shepp-Logan filter for absorption X-ray CT. Hilbert filter for differential phase contrast X-ray CT |[x]|[x]|LGPL-v3|
 | Backprojection (FDK)| Backprojection using FDK on GPU |[x] |[x]| GPL-v3 |
 | Histogram and converting tool | Histogram evaluation of raw data stacks. Supports data range selection and conversion from 32 Bit to 8 or 16 Bit raw data | | [x] | LGPL-v3 |
-| Phase retrieval | Phase retrieval tool for grating based phase contrast X-ray CT |[x] | GPL-v3 |
+| Phase retrieval | Phase retrieval tool for grating based phase contrast X-ray CT |[x] | | GPL-v3 |
 | Phase contrast X-ray CT | Matlab scripts for grating and propagation based X-ray imaging | [x]| |GPL-v3 |
