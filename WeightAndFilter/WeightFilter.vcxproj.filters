@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="errormessages.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="filter.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="main_process.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="parameter.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="pre_process_pipeline.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="space_domain_filter_def.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="data_IO.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="errormessages.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="filter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="filter_parameter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterException.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="parameter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="pre_process_pipeline.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="space_domain_filter_def.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="typesFDK.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="utility.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{3b61b91b-8979-4a95-84b2-ea3936f9df44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{2e4956ee-0692-49ee-b9d5-e79225dba160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{f0dc4976-2b3a-46d7-a669-784cfa4423a2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="FTK_Filter.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
