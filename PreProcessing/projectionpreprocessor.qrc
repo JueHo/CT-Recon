@@ -1,0 +1,17 @@
+<RCC>
+  <qresource prefix="ProjectionPreProcessor">
+    <file>Images/Lorentz.png</file>
+    <file>Pre-Proc.png</file>
+    <file>Images/exportpfdk.png</file>
+    <file>Images/forward.png</file>
+    <file>Images/about.png</file>
+    <file>Images/edit.png</file>
+    <file>Images/exit.png</file>
+    <file>Images/saveas.png</file>
+    <file>Images/clear-32.png</file>
+    <file>Images/new-32.png</file>
+    <file>Images/open-32.png</file>
+    <file>Images/save.png</file>
+    <file>Images/save-32.png</file>
+  </qresource>
+</RCC>
