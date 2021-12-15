@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header">
+      <UniqueIdentifier>{865f20d5-522c-44e1-a73b-6f05e78ecd4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{35d88a05-903e-4e03-9e21-29c19788f65c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GPU">
+      <UniqueIdentifier>{9c80c768-366a-4031-a606-2d01a4c1d6d6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="convert.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="errormessages.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterException.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="mainwindow.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="parameter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="plot_struct.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="qcustomplot.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="reader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="recon.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="rot_ax_det.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="typesFDK.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_mainwindow.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="reconFDK_kernelCoR.cuh">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="errormessages.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="mainwindow.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="parameter.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="qcustomplot.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="reader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="rot_ax_det.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="_mainwindow.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="_qcustomplot.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="errorHandler.cu">
+      <Filter>GPU</Filter>
+    </CudaCompile>
+    <CudaCompile Include="graphicCardProp.cu">
+      <Filter>GPU</Filter>
+    </CudaCompile>
+    <CudaCompile Include="reconCoR.cu">
+      <Filter>GPU</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RotationAxisDetermination.rc" />
+  </ItemGroup>
+</Project>
