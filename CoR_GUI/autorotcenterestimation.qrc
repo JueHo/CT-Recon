@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="AutoRotCenterEstimation">
+    <file>Icon.png</file>
+    <file>Icon.ico</file>
+  </qresource>
+</RCC>
