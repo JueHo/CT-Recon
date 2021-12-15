@@ -1,0 +1,26 @@
+# input directory
+input_directory = PhaseContrast-Stepping/measurement6
+# output directory (must exist)
+output_directory = PhaseContrast-Stepping/measurement6
+# file numbering starts with index
+start_index= 1
+# name of raw/flat/dark image file without number (no leading 0 is allowed)
+raw_image_name = sample_
+flat_image_name=flat_ 
+dark_image_name=dark_
+# how many images exists
+number_image=10
+# how manny dark field images exist (if > 1 dark images will be averaged)
+number_dark=1
+# Specify window which should be used for proccessing
+# window starts at column:
+window_col=900
+# window starts at row:
+window_row=630
+# spec. of window width
+window_width=900
+# spec. of window height
+window_height=1100
+#
+# Remark: Even if only one dark field image exist a numbering is necessary 
+# (flat_1.tif --> flat_image_name=flat_ , number_dark=1)
