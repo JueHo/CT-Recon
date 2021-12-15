@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="errorHandler.cu">
+      <Filter>GPU</Filter>
+    </CudaCompile>
+    <CudaCompile Include="graphicCardProp.cu">
+      <Filter>GPU</Filter>
+    </CudaCompile>
+    <CudaCompile Include="recon.cu">
+      <Filter>GPU</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="parameter.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="reader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="errormessages.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="convert.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="errormessages.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterException.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="parameter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="reader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="recon.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="typesFDK.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="reconFDK_kernel.cuh">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{96a88170-1201-4985-9793-226c3d833511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{04e38c13-e7d7-46ea-88e4-6093fc5a5280}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GPU">
+      <UniqueIdentifier>{0ffd3df0-cf82-4981-beb2-33167e67f093}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="FDKRecon.rc" />
+  </ItemGroup>
+</Project>
