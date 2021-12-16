@@ -8,7 +8,7 @@ Neither for the input data nor the reconstructed voxel volume.
 For grating and propagation based phase contrast X-ray imaging 
 additional Matlab scripts are provided.
 
-For build instructions see file: *build_info.txt*
+For build instructions see: ***build_info.md***
 
 
 **Currently the following modules are available:**
