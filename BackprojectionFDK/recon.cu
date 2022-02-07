@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #include "reconFDK_kernel.cuh"
@@ -131,7 +131,6 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 
 	// estimate number of chunks of z-slices
 	// depending on available memory
-	//int number_z_chunks = 17;  // hard coded
 	int number_y_chunks = static_cast<int>(param.sliceChunkSize);
 	// stacksize of z-slices process as a block at once
 	int backproj_chunks	= param.volY/number_y_chunks;
@@ -307,12 +306,14 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 			}
 			io_stop = clock();
 			io_time += (float)(io_stop - io_start) / CLOCKS_PER_SEC;
+			
+			// cuda array descriptor
 			cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32,0,0,0,cudaChannelFormatKindFloat);
-			//-ju- device memory sinogram
+			// device memory of sinogram batch
 			cudaArray *d_sino;
 			//-ju- allocate memory holding texture device memory
 			const cudaExtent volumeSize = make_cudaExtent(param.imgWidth, param.imgHeight, nProjUse);
-			//HANDLE_ERROR(cudaMalloc3DArray(&d_sino, &channelDesc, volumeSize));
+			//-ju- For 3D texture use: HANDLE_ERROR(cudaMalloc3DArray(&d_sino, &channelDesc, volumeSize));
 			HANDLE_ERROR(cudaMalloc3DArray(&d_sino, &channelDesc, volumeSize, cudaArrayLayered));
 			//-ju- copy memory host to device
 			cudaMemcpy3DParms copyParams = {0};
@@ -327,18 +328,33 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 													  volumeSize.height);
 			HANDLE_ERROR(cudaMemcpy3D(&copyParams));
 
-			//-ju- channel descriptor
-			//cudaChannelFormatDesc desc = cudaCreateChannelDesc<float>();
-			//texSino.addressMode[0]     = cudaAddressModeClamp;
-			texSinoLay.addressMode[0]     = cudaAddressModeBorder; //-ju- -> set out of border access to 0
-			//texSino.addressMode[1]     = cudaAddressModeClamp;
-			texSinoLay.addressMode[1]     = cudaAddressModeBorder;
-			texSinoLay.filterMode         = cudaFilterModeLinear;
-            //texSino.filterMode         = cudaFilterModePoint;
-			texSinoLay.normalized         = false;
+			//-ju-02-02-2022 migration from texture references to texture objects
+			/////////////////////////////////////////////////////////////////////
+			cudaResourceDesc    texRes;
+			memset(&texRes, 0, sizeof(cudaResourceDesc));
+			texRes.resType = cudaResourceTypeArray;
+			texRes.res.array.array = d_sino;
+			cudaTextureDesc     texDescr;
+			memset(&texDescr, 0, sizeof(cudaTextureDesc));
+			texDescr.normalizedCoords = false;
+			texDescr.filterMode = cudaFilterModeLinear;       // bi-linear filtering of pixels 
+			texDescr.addressMode[0] = cudaAddressModeBorder;  // value out of border is 0  
+			texDescr.addressMode[1] = cudaAddressModeBorder;
+			texDescr.addressMode[2] = cudaAddressModeBorder;
+			texDescr.readMode = cudaReadModeElementType;
 
-			//-ju- bind texture to array device memory
-			HANDLE_ERROR(cudaBindTextureToArray(texSinoLay, d_sino, channelDesc));
+			// cuda resource description
+			struct cudaResourceDesc resDesc;
+			memset(&resDesc, 0, sizeof(resDesc));
+			resDesc.resType = cudaResourceTypeArray;
+			resDesc.res.array.array = d_sino;
+			// Specify texture object parameters
+			struct cudaTextureDesc texDesc;
+			memset(&texDesc, 0, sizeof(texDesc));
+			// create texture object
+			cudaTextureObject_t tex3DLayObj = 0;
+			cudaCreateTextureObject(&tex3DLayObj, &resDesc, &texDesc, NULL);
+			//02-02-2022////////////////////////////////////////////////////////////
 
 			//-ju-11-Dec-2015 add streams
 			cudaStream_t *stream = (cudaStream_t *)malloc(STREAM_SIZE * sizeof(cudaStream_t));
@@ -411,7 +427,8 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 									cuProjBlockIdx, remainProj,
 									param.volX, param.volZ,
 									offset_current, param.shiftY,
-									param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ);
+									param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ, 
+									tex3DLayObj /*02-02-2022 texture object*/);
 							}
 							else
 							{
@@ -419,7 +436,8 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 									cuProjBlockIdx, remainProj,
 									param.volX, param.volZ,
 									offset_current, param.shiftY,
-									param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ);
+									param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ, 
+									tex3DLayObj /*02-02-2022 texture object*/);
 							}
 						}
 						else
@@ -433,7 +451,8 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 									cuProjBlockIdx,
 									param.volX, param.volZ,
 									offset_current, param.shiftY,
-									param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ);
+									param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ, 
+									tex3DLayObj /*02-02-2022 texture object*/);
 							}
 							else
 							{
@@ -441,7 +460,8 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 									cuProjBlockIdx,
 									param.volX, param.volZ,
 									offset_current, param.shiftY,
-									param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ);
+									param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ, 
+									tex3DLayObj /*02-02-2022 texture object*/);
 							}
 						}
 					}
@@ -474,7 +494,7 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 			}
 
 			//-ju- unbind texture
-			cudaUnbindTexture(texSinoLay);
+			//-ju-02-02-2022 cudaUnbindTexture(texSinoLay);
 
 			//-ju- free device memory used for sinograms (chunks wise)
 			HANDLE_ERROR(cudaFreeArray(d_sino));
