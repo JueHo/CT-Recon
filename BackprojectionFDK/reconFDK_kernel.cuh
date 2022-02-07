@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #ifndef _RECON_FDK_KERNEL_H
@@ -23,8 +23,10 @@ using namespace std;
 #define PI 3.1415927f
 #define CORR_TERM 0.5f
 
+/*-ju-02-02-2022 migration from texture references to texture objects
 texture<float, cudaTextureType3D>  texSino;
 texture<float,cudaTextureType2DLayered> texSinoLay;
+*/
 
 typedef struct
 {
@@ -100,7 +102,7 @@ __forceinline__  __device__ void GetInterpolationPoint(const VolType &voxel, Poi
 /////////////////////////////////////////////////////////////////////////////
 //-ju-03-Nov-2016 more accurate (not hardware based) bi-linear interpolation
 /////////////////////////////////////////////////////////////////////////////
-__forceinline__  __device__ float tex2DLayeredHighPrec(texture<float, cudaTextureType2DLayered> tex,
+__forceinline__  __device__ float tex2DLayeredHighPrec(cudaTextureObject_t tex,
 	const float &x_in, const float &y_in, const int layer)
 {
 	const int    ix = floor(x_in);
@@ -108,10 +110,10 @@ __forceinline__  __device__ float tex2DLayeredHighPrec(texture<float, cudaTextur
 	const float x = x_in - ix;
 	const float y = y_in - iy;
 
-	const float v00 = tex2DLayered(tex, ix, iy, layer);
-	const float v10 = tex2DLayered(tex, ix + 1, iy, layer);
-	const float v11 = tex2DLayered(tex, ix + 1, iy + 1, layer);
-	const float v01 = tex2DLayered(tex, ix, iy + 1, layer);
+	const float v00 = tex2DLayered<float>(tex, ix, iy, layer);
+	const float v10 = tex2DLayered<float>(tex, ix + 1, iy, layer);
+	const float v11 = tex2DLayered<float>(tex, ix + 1, iy + 1, layer);
+	const float v01 = tex2DLayered<float>(tex, ix, iy + 1, layer);
 
 	//r1 = x * v10 + (-v00 * x + v00); // --> __fmaf_rn(a,d10.x,__fmaf_rn(-d00.x,a,d00.x)) ju  
 	//r2 = x * v11 + (-v01 * x + v01);
@@ -141,7 +143,8 @@ __global__ void fdk_kernel_3DW(float *d_backProj,    // accumulated back project
 							   float  yOffset,
 							   float  winOrigX, 
 							   float  winOrigY, 
-							   float  winOrigZ) 
+							   float  winOrigZ,
+							   cudaTextureObject_t tex3DLayObj) //-ju-0202-2022 texture object
 {
 	//-ju-09-Dec-2015
 	float vst[MAP];
@@ -175,7 +178,7 @@ __global__ void fdk_kernel_3DW(float *d_backProj,    // accumulated back project
 			for (int k = 0; k < MAP; k++)
 			{
 				GetInterpolationPoint(vox, interpolPoint, phi, l_weight, winOrigX, winOrigY, winOrigZ);
-				vst[k] += tex2DLayered(texSinoLay,interpolPoint.x+xOffset_loc,interpolPoint.y+yOffset_loc,i)*l_weight;
+				vst[k] += tex2DLayered<float>(tex3DLayObj,interpolPoint.x+xOffset_loc,interpolPoint.y+yOffset_loc,i)*l_weight;
 				vox.y = vox.y + 1.0f;
 			}
 			vox.y = (float)y_c + 0.5f;
@@ -202,7 +205,8 @@ __global__ void fdk_kernel_3DW_R(float *d_backProj,    // accumulated back proje
 							     float  yOffset,
 							     float  winOrigX, 
 							     float  winOrigY, 
-							     float  winOrigZ) 
+							     float  winOrigZ,
+								 cudaTextureObject_t tex3DLayObj) //-ju-0202-2022 texture object
 {
 	//-ju-09-Dec-2015
 	float vst[MAP];
@@ -237,7 +241,7 @@ __global__ void fdk_kernel_3DW_R(float *d_backProj,    // accumulated back proje
 			for (int k = 0; k < MAP; k++)
 			{
 				GetInterpolationPoint(vox, interpolPoint, phi, l_weight, winOrigX, winOrigY, winOrigZ);
-				vst[k] += tex2DLayered(texSinoLay, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
+				vst[k] += tex2DLayered<float>(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
 				vox.y = vox.y + 1.0f;
 			}
 			vox.y = (float)y_c + 0.5f;
@@ -263,7 +267,8 @@ __global__ void fdk_kernel_3DW_HA(float *d_backProj,
 	float  yOffset,
 	float  winOrigX,
 	float  winOrigY,
-	float  winOrigZ)
+	float  winOrigZ,
+	cudaTextureObject_t tex3DLayObj) //-ju-0202-2022 texture object
 {
 	//-ju-09-Dec-2015
 	float vst[MAP];
@@ -297,7 +302,7 @@ __global__ void fdk_kernel_3DW_HA(float *d_backProj,
 			for (int k = 0; k < MAP; k++)
 			{
 				GetInterpolationPoint(vox, interpolPoint, phi, l_weight, winOrigX, winOrigY, winOrigZ);
-				vst[k] += tex2DLayeredHighPrec(texSinoLay, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
+				vst[k] += tex2DLayeredHighPrec(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
 				vox.y = vox.y + 1.0f;
 			}
 			vox.y = (float)y_c + 0.5f;
@@ -323,7 +328,8 @@ __global__ void fdk_kernel_3DW_R_HA(float *d_backProj,    // accumulated back pr
 	float  yOffset,
 	float  winOrigX,
 	float  winOrigY,
-	float  winOrigZ)
+	float  winOrigZ,
+	cudaTextureObject_t tex3DLayObj) //-ju-02-02-2022 texture object
 {
 	//-ju-09-Dec-2015
 	float vst[MAP];
@@ -357,7 +363,7 @@ __global__ void fdk_kernel_3DW_R_HA(float *d_backProj,    // accumulated back pr
 			for (int k = 0; k < MAP; k++)
 			{
 				GetInterpolationPoint(vox, interpolPoint, phi, l_weight, winOrigX, winOrigY, winOrigZ);
-				vst[k] += tex2DLayeredHighPrec(texSinoLay, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
+				vst[k] += tex2DLayeredHighPrec(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
 				vox.y = vox.y + 1.0f;
 			}
 			vox.y = (float)y_c + 0.5f;
