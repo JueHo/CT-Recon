@@ -301,14 +301,30 @@ extern "C"
                 volumeSize.height);
             HANDLE_ERROR(cudaMemcpy3D(&copyParams));
 
-            texSinoLay.addressMode[0]     = cudaAddressModeBorder; //-ju- -> set out of border access to 0
-            texSinoLay.addressMode[1]     = cudaAddressModeBorder;
-            texSinoLay.filterMode         = cudaFilterModeLinear; // use bilinear interpolation
-            texSinoLay.normalized         = false;
+			cudaResourceDesc    texRes;
+			memset(&texRes, 0, sizeof(cudaResourceDesc));
+			texRes.resType = cudaResourceTypeArray;
+			texRes.res.array.array = d_sino;
+			cudaTextureDesc     texDescr;
+			memset(&texDescr, 0, sizeof(cudaTextureDesc));
+			texDescr.normalizedCoords = false;
+			texDescr.filterMode = cudaFilterModeLinear;       // bi-linear filtering of pixels 
+			texDescr.addressMode[0] = cudaAddressModeBorder;  // value out of border is 0  
+			texDescr.addressMode[1] = cudaAddressModeBorder;
+			texDescr.addressMode[2] = cudaAddressModeBorder;
+			texDescr.readMode = cudaReadModeElementType;
 
-            //-ju- bind texture to array device memory
-            HANDLE_ERROR(cudaBindTextureToArray(texSinoLay, d_sino, channelDesc));
-
+			// cuda resource description
+			struct cudaResourceDesc resDesc;
+			memset(&resDesc, 0, sizeof(resDesc));
+			resDesc.resType = cudaResourceTypeArray;
+			resDesc.res.array.array = d_sino;
+			// Specify texture object parameters
+			struct cudaTextureDesc texDesc;
+			memset(&texDesc, 0, sizeof(texDesc));
+			// create texture object
+			cudaTextureObject_t tex3DLayObj = 0;
+			cudaCreateTextureObject(&tex3DLayObj, &resDesc, &texDesc, NULL);
 
             int index = 0;
             for(int iy=yChunkStart; iy<yChunkEnd; iy++)
@@ -341,7 +357,8 @@ extern "C"
                         cuProjBlockIdx, remainProj, 
                         param.volX, param.volZ, 
                         horizShift, param.shiftY, 
-                        param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ);
+                        param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ,
+                        tex3DLayObj);
                 }
                 else
                 {
@@ -351,7 +368,8 @@ extern "C"
                         cuProjBlockIdx, 
                         param.volX, param.volZ, 
                         horizShift, param.shiftY, 
-                        param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ);
+                        param.wVolOrigX, param.wVolOrigY, param.wVolOrigZ,
+                        tex3DLayObj);
                 }
 
                 getLastCudaError("Kernel execution failed");
@@ -361,8 +379,6 @@ extern "C"
                 HANDLE_ERROR(cudaFree(d_backProj));
                 index++;
             }
-            //-ju- unbind texture
-            cudaUnbindTexture(texSinoLay);
 
             //-ju- free device memory used for sinograms (chunks wise)
             HANDLE_ERROR(cudaFreeArray(d_sino));
