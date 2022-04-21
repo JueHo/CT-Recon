@@ -3,7 +3,7 @@
 CT-Recon is a collection of tools for CT reconstruction.
 These tools have been developed and extended during the last 11 years.
 Backprojection is running on GPU, implemented with NVIDIA CUDA toolkit.
-There is no restiction in data size for CT reconstruction. 
+There is no restriction in data size for CT reconstruction. 
 Neither for the input data nor the reconstructed voxel volume.
 For grating and propagation based phase contrast X-ray imaging 
 additional Matlab scripts are provided.
