@@ -57,37 +57,6 @@ typedef struct
 
 __constant__ FDK_Constants fdkConst;
 
-// max. number of projections
-#define MAX_PROJ_NUM 2000
-__constant__ float radsConst[MAX_PROJ_NUM];
-
-//-ju-14-Apr-2016 Higher precision bi-linear interpolation
-/////////////////////////////////////////////////////////
-__forceinline__  __device__ float tex2DLayeredHighPrec(texture<float, cudaTextureType2DLayered> tex,
-	const float &x_in, const float &y_in, const int layer)
-{
-	const int    ix = floor(x_in);
-	const int    iy = floor(y_in);
-	const float x = x_in - ix;
-	const float y = y_in - iy;
-
-	const float v00 = tex2DLayered<float>(tex, ix, iy, layer);
-	const float v10 = tex2DLayered<float>(tex, ix + 1, iy, layer);
-	const float v11 = tex2DLayered<float>(tex, ix + 1, iy + 1, layer);
-	const float v01 = tex2DLayered<float>(tex, ix, iy + 1, layer);
-
-	//r1 = x * v10 + (-v00 * x + v00); // --> __fmaf_rn(a,d10.x,__fmaf_rn(-d00.x,a,d00.x)) ju  
-	//r2 = x * v11 + (-v01 * x + v01);
-	const float r1 = __fmaf_rn(x, v10, __fmaf_rn(-v00, x, v00));
-	const float r2 = __fmaf_rn(x, v11, __fmaf_rn(-v01, x, v01));
-
-	//return (y * r2 + (-r1 * y + r1));
-	return __fmaf_rn(y, r2, __fmaf_rn(-r1, y, r1));
-}
-
-
-
-
 ////////////////////////////////////////////////////////
 // Calculate interpolation point on projection and
 // weighting in voxel volume regarding its position
@@ -168,7 +137,7 @@ __global__ void fdk_kernel_3DW(float *d_backProj,    // accumulated back project
 			GetInterpolationPoint(vox, interpolPoint, phi, l_weight, _winOrigX, _winOrigY, winOrigZ);
 
 			//-ju-24-May-2022 replace texture reference by texture object
-			l_back += (tex2DLayeredHighPrec(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i))*l_weight;
+			l_back += tex2DLayered<float>(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
 
 
 		}
@@ -217,7 +186,7 @@ __global__ void fdk_kernel_3DW_R(float *d_backProj,    // accumulated back proje
 			GetInterpolationPoint(vox, interpolPoint, phi, l_weight, winOrigX, winOrigY, winOrigZ);
 
 			//-ju-24-May-2022 replace texture reference by texture object
-			l_back += (tex2DLayeredHighPrec(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i))*l_weight;
+			l_back += tex2DLayered<float>(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
 
 		}
 		d_backProj[x + z*volWidth] += l_back;
