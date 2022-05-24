@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #ifndef _RECON_FDK_KERNEL_H
@@ -20,12 +20,13 @@ using namespace std;
 #define CORR_TERM 0.5f
 
 
-
+/* use texure objects; texture refrences have been declared deprecated starting from Cuda 11.0
 texture<float, cudaTextureType3D>  texSino;
 texture<float,cudaTextureType2DLayered> texSinoLay;
 //-ju-15-Mar-2011 texture for cos and sin
 texture<float,1,cudaReadModeElementType> sinusTexRef;
 texture<float,1,cudaReadModeElementType> cosinusTexRef;
+*/
 
 typedef struct
 {
@@ -70,10 +71,10 @@ __forceinline__  __device__ float tex2DLayeredHighPrec(texture<float, cudaTextur
 	const float x = x_in - ix;
 	const float y = y_in - iy;
 
-	const float v00 = tex2DLayered(tex, ix, iy, layer);
-	const float v10 = tex2DLayered(tex, ix + 1, iy, layer);
-	const float v11 = tex2DLayered(tex, ix + 1, iy + 1, layer);
-	const float v01 = tex2DLayered(tex, ix, iy + 1, layer);
+	const float v00 = tex2DLayered<float>(tex, ix, iy, layer);
+	const float v10 = tex2DLayered<float>(tex, ix + 1, iy, layer);
+	const float v11 = tex2DLayered<float>(tex, ix + 1, iy + 1, layer);
+	const float v01 = tex2DLayered<float>(tex, ix, iy + 1, layer);
 
 	//r1 = x * v10 + (-v00 * x + v00); // --> __fmaf_rn(a,d10.x,__fmaf_rn(-d00.x,a,d00.x)) ju  
 	//r2 = x * v11 + (-v01 * x + v01);
@@ -135,7 +136,8 @@ __global__ void fdk_kernel_3DW(float *d_backProj,    // accumulated back project
 							   float  yOffset,
 							   float  winOrigX, 
 							   float  winOrigY, 
-							   float  winOrigZ) 
+							   float  winOrigZ,
+			      			   cudaTextureObject_t tex3DLayObj) //-ju-24-May-2022 add texture object
 {
 	// map from threadIdx/BlockIdx to pixel position
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
@@ -165,7 +167,8 @@ __global__ void fdk_kernel_3DW(float *d_backProj,    // accumulated back project
 			float _winOrigY = winOrigY - yOffset_loc;
 			GetInterpolationPoint(vox, interpolPoint, phi, l_weight, _winOrigX, _winOrigY, winOrigZ);
 
-			l_back += (tex2DLayeredHighPrec(texSinoLay, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i))*l_weight;
+			//-ju-24-May-2022 replace texture reference by texture object
+			l_back += (tex2DLayeredHighPrec(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i))*l_weight;
 
 
 		}
@@ -185,7 +188,8 @@ __global__ void fdk_kernel_3DW_R(float *d_backProj,    // accumulated back proje
 							     float  yOffset,
 							     float  winOrigX, 
 							     float  winOrigY, 
-							     float  winOrigZ) 
+							     float  winOrigZ,
+			      				 cudaTextureObject_t tex3DLayObj) //-ju-24-May-2022 add texture object) 
 {
 	// map from threadIdx/BlockIdx to pixel position
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
@@ -212,7 +216,8 @@ __global__ void fdk_kernel_3DW_R(float *d_backProj,    // accumulated back proje
 			phi = fdkConst.angleIncr*(cuProjBlockIdx*fdkConst.projProcSize + i);
 			GetInterpolationPoint(vox, interpolPoint, phi, l_weight, winOrigX, winOrigY, winOrigZ);
 
-			l_back += (tex2DLayeredHighPrec(texSinoLay, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i))*l_weight;
+			//-ju-24-May-2022 replace texture reference by texture object
+			l_back += (tex2DLayeredHighPrec(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i))*l_weight;
 
 		}
 		d_backProj[x + z*volWidth] += l_back;
