@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2015], Empa, Juergen Hofmann
+*  Copyright Â© [2015], Empa, Juergen Hofmann
 */
 
 #include "threadprocessing.h"
@@ -498,12 +498,6 @@ void ThreadProcessing::NormalizeImages(float *VolMem)
 				float corr = 1.0f;
 				// just fill border values with 1.0
 				medianRatioMap.at<float>(iy, medianRatioMap.cols - 1) = corr;
-				for (int ix = medianRatioMap.cols - 2; ix >= 0; ix--)
-				{
-					// leave values as they are --> could probably done better
-					corr = medianRatioMap.at<float>(iy, ix)*corr;
-					medianRatioMap.at<float>(iy, ix) = corr;
-				}
 			}
 		} // useRac end
 #ifdef _DEBUG_OUT
@@ -833,11 +827,6 @@ void ThreadProcessing::NormalizeImages(float *VolMem)
 			{
 				float corr = 1.0f;
 				medianRatioMap.at<float>(iy, medianRatioMap.cols - 1) = corr;
-				for (int ix = medianRatioMap.cols - 2; ix >= 0; ix--)
-				{
-					corr = medianRatioMap.at<float>(iy, ix)*corr;
-					medianRatioMap.at<float>(iy, ix) = corr;
-				}
 			}
 		} // useRAC
 		//-ju-29-Aug-2016 add convolution --> high pass filter
@@ -1146,11 +1135,6 @@ void ThreadProcessing::NormalizeImages(float *VolMem, uint64_t tileHeight, uint6
 			{
 				float corr = 1.0f;
 				medianRatioMap.at<float>(iy, medianRatioMap.cols - 1) = corr;
-				for (int ix = medianRatioMap.cols - 2; ix >= 0; ix--)
-				{
-					corr = medianRatioMap.at<float>(iy, ix)*corr;
-					medianRatioMap.at<float>(iy, ix) = corr;
-				}
 			}
 		} // useRac end
 #ifdef _DEBUG_OUT
@@ -1460,11 +1444,6 @@ void ThreadProcessing::NormalizeImages(float *VolMem, uint64_t tileHeight, uint6
 			{
 				float corr = 1.0f;
 				medianRatioMap.at<float>(iy, medianRatioMap.cols - 1) = corr;
-				for (int ix = medianRatioMap.cols - 2; ix >= 0; ix--)
-				{
-					corr = medianRatioMap.at<float>(iy, ix)*corr;
-					medianRatioMap.at<float>(iy, ix) = corr;
-				}
 			}
 		} // end useRAC
 		//-ju-29-Aug-2016 add convolution --> high pass filter
