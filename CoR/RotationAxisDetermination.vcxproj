@@ -140,7 +140,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>MICRO_CT;WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(EIGEN_DIR);$(OPENCV_DIR)\include;$(QTDIR)\include;$(BOOST_DIR);%(AdditionalIncludeDirectories);C:\ProgramData\NVIDIA Corporation\CUDA Samples\v10.0\common\inc;$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EIGEN_DIR);$(OPENCV_DIR)\include;%CUDA_HELPER%\common\inc;$(QTDIR)\include;$(BOOST_DIR);%(AdditionalIncludeDirectories);C:\ProgramData\NVIDIA Corporation\CUDA Samples\v10.0\common\inc;$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <MinimalRebuild>false</MinimalRebuild>
@@ -160,8 +160,8 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <GPUDebugInfo>true</GPUDebugInfo>
       <MaxRegCount>36</MaxRegCount>
       <FastMath>false</FastMath>
-      <GenerateLineInfo>true</GenerateLineInfo>
-      <CodeGeneration>compute_35,sm_35</CodeGeneration>
+      <GenerateLineInfo>false</GenerateLineInfo>
+      <CodeGeneration>compute_30,sm_30;compute_50,sm_50;compute_52,sm_52;compute_60,sm_60</CodeGeneration>
     </CudaCompile>
     <CudaLink>
       <GPUDebugInfo>true</GPUDebugInfo>
