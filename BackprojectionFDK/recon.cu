@@ -87,7 +87,7 @@ void InitAngleTable(const BackProjParam &param)
 	{
 		rads_temp[i] = param.angleList[i]*angle2rad;
 	}
-	HANDLE_ERROR(cudaMemcpyToSymbol(radsConst, &rads_temp[0], sizeof(float)*rads_temp.size()));
+	checkCudaErrors(cudaMemcpyToSymbol(radsConst, &rads_temp[0], sizeof(float)*rads_temp.size()));
 }
 
 
@@ -177,7 +177,7 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 	cout << "Volume dimensions: [" << param.volX << "," << param.volY << "," << param.volZ << "]\n";
 	cout.flush();
 
-	HANDLE_ERROR(cudaMemcpyToSymbol(fdkConst, tmp_c, sizeof(FDK_Constants)));
+	checkCudaErrors(cudaMemcpyToSymbol(fdkConst, tmp_c, sizeof(FDK_Constants)));
 	free(tmp_c);
 
 	unsigned int dimThreadsX = param.threadX;
@@ -229,7 +229,7 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 #ifdef _ASYNC_IO
 		float *h_backproj_chunk;
 		chunkSize = chunkSize*(unsigned long long)sizeof(float);
-		HANDLE_ERROR(cudaMallocHost((void**)&h_backproj_chunk, chunkSize));
+		checkCudaErrors(cudaMallocHost((void**)&h_backproj_chunk, chunkSize));
 #else
 		float *h_backproj_chunk = new float[chunkSize];
 #endif
@@ -314,7 +314,7 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 			//-ju- allocate memory holding texture device memory
 			const cudaExtent volumeSize = make_cudaExtent(param.imgWidth, param.imgHeight, nProjUse);
 			//-ju- For 3D texture use: HANDLE_ERROR(cudaMalloc3DArray(&d_sino, &channelDesc, volumeSize));
-			HANDLE_ERROR(cudaMalloc3DArray(&d_sino, &channelDesc, volumeSize, cudaArrayLayered));
+			checkCudaErrors(cudaMalloc3DArray(&d_sino, &channelDesc, volumeSize, cudaArrayLayered));
 			//-ju- copy memory host to device
 			cudaMemcpy3DParms copyParams = {0};
 			copyParams.srcPos   = make_cudaPos(0,0,0);
@@ -323,37 +323,30 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 			copyParams.kind     = cudaMemcpyHostToDevice;
 			copyParams.dstArray = d_sino;
 			copyParams.srcPtr   = make_cudaPitchedPtr(h_sinoData,
-													  volumeSize.width*sizeof(float),
-													  volumeSize.width,
-													  volumeSize.height);
-			HANDLE_ERROR(cudaMemcpy3D(&copyParams));
+								  volumeSize.width*sizeof(float),
+								  volumeSize.width,
+								  volumeSize.height);
+			checkCudaErrors(cudaMemcpy3D(&copyParams));
 
 			//-ju-02-02-2022 migration from texture references to texture objects
 			/////////////////////////////////////////////////////////////////////
-			cudaResourceDesc    texRes;
+			cudaTextureObject_t tex3DLayObj = 0;
+			cudaResourceDesc texRes;
 			memset(&texRes, 0, sizeof(cudaResourceDesc));
+
 			texRes.resType = cudaResourceTypeArray;
 			texRes.res.array.array = d_sino;
-			cudaTextureDesc     texDescr;
+
+			cudaTextureDesc texDescr;
 			memset(&texDescr, 0, sizeof(cudaTextureDesc));
+
 			texDescr.normalizedCoords = false;
-			texDescr.filterMode = cudaFilterModeLinear;       // bi-linear filtering of pixels 
-			texDescr.addressMode[0] = cudaAddressModeBorder;  // value out of border is 0  
+			texDescr.filterMode = cudaFilterModeLinear;
+			texDescr.addressMode[0] = cudaAddressModeBorder;
 			texDescr.addressMode[1] = cudaAddressModeBorder;
-			texDescr.addressMode[2] = cudaAddressModeBorder;
 			texDescr.readMode = cudaReadModeElementType;
 
-			// cuda resource description
-			struct cudaResourceDesc resDesc;
-			memset(&resDesc, 0, sizeof(resDesc));
-			resDesc.resType = cudaResourceTypeArray;
-			resDesc.res.array.array = d_sino;
-			// Specify texture object parameters
-			struct cudaTextureDesc texDesc;
-			memset(&texDesc, 0, sizeof(texDesc));
-			// create texture object
-			cudaTextureObject_t tex3DLayObj = 0;
-			cudaCreateTextureObject(&tex3DLayObj, &resDesc, &texDesc, NULL);
+			checkCudaErrors(cudaCreateTextureObject(&tex3DLayObj, &texRes, &texDescr, NULL));
 			//02-02-2022////////////////////////////////////////////////////////////
 
 			//-ju-11-Dec-2015 add streams
@@ -477,7 +470,7 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 
 				for (int i = 0; i < STREAM_SIZE; i++)
 				{
-					HANDLE_ERROR(cudaFree(d_backProj[i]));
+					checkCudaErrors(cudaFree(d_backProj[i]));
 				}
 				index = index + MAP*STREAM_SIZE;
 
@@ -495,9 +488,11 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 
 			//-ju- unbind texture
 			//-ju-02-02-2022 cudaUnbindTexture(texSinoLay);
+			
+			checkCudaErrors(cudaDestroyTextureObject(tex3DLayObj));
 
 			//-ju- free device memory used for sinograms (chunks wise)
-			HANDLE_ERROR(cudaFreeArray(d_sino));
+			checkCudaErrors(cudaFreeArray(d_sino));
 
 		}
 
@@ -595,7 +590,7 @@ int runFDK(BackProjParam param, int devNo, float *minGray, float *maxGray, FILE 
 	//ReleaseLookUpResources();
 
 	//-ju-21-Oct-2014 cudaThreadExit(); --> replaced by cudaDeviceReset()
-    cudaDeviceReset();
+        cudaDeviceReset();
 	stop = clock();
 	float duration = (float)(stop - start) / CLOCKS_PER_SEC;
 	*maxGray = tomoMax;
