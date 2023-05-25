@@ -15,6 +15,8 @@
 
 using namespace std;
 
+#define MAPPING 1 // no optimization -> set to 1
+#define STREAM_SIZE 1 // no optimization -> set to 1
 #define PIX_MIDTH 0.5f
 #define PI 3.1415927f
 #define CORR_TERM 0.5f
@@ -93,9 +95,35 @@ __forceinline__  __device__ void GetInterpolationPoint(const VolType &voxel, Poi
 	weight = (dso*dso)/(denominator*denominator);
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// More accurate (not hardware based) bi-linear interpolation
+/////////////////////////////////////////////////////////////////////////////
+__forceinline__  __device__ float tex2DLayeredHighPrec(cudaTextureObject_t tex,
+	const float &x_in, const float &y_in, const int layer)
+{
+	const int    ix = floor(x_in);
+	const int    iy = floor(y_in);
+	const float x = x_in - ix;
+	const float y = y_in - iy;
+
+	const float v00 = tex2DLayered<float>(tex, ix, iy, layer);
+	const float v10 = tex2DLayered<float>(tex, ix + 1, iy, layer);
+	const float v11 = tex2DLayered<float>(tex, ix + 1, iy + 1, layer);
+	const float v01 = tex2DLayered<float>(tex, ix, iy + 1, layer);
+
+	//r1 = x * v10 + (-v00 * x + v00); // --> __fmaf_rn(a,d10.x,__fmaf_rn(-d00.x,a,d00.x)) ju  
+	//r2 = x * v11 + (-v01 * x + v01);
+	const float r1 = __fmaf_rn(x, v10, __fmaf_rn(-v00, x, v00));
+	const float r2 = __fmaf_rn(x, v11, __fmaf_rn(-v01, x, v01));
+
+	//return (y * r2 + (-r1 * y + r1));
+	return __fmaf_rn(y, r2, __fmaf_rn(-r1, y, r1));
+}
+
 
 // Reconstruction of a 3D-window
 // Standard backprojection kernel
+///////////////////////////////////
 __global__ void fdk_kernel_3DW(float *d_backProj,    // accumulated back projected slice
 							   int    y_c,           // current y-slice
 							   int    cuProjBlockIdx, // current projection block index to use
@@ -193,5 +221,125 @@ __global__ void fdk_kernel_3DW_R(float *d_backProj,    // accumulated back proje
 	}
 }
 
+// reconstruction of a 3D-window
+// Kernel using accurate bi-linear interpolation
+///////////////////////////////////////////////////////////////////////////////////////////////
+__global__ void fdk_kernel_3DW_HA(float *d_backProj,
+	int    y_c,           // current y-slice
+	int    cuProjBlockIdx, // current projection block index to use
+	int    volWidth,
+	int	  volDepth,
+	float  xOffset,
+	float  yOffset,
+	float  winOrigX,
+	float  winOrigY,
+	float  winOrigZ,
+	cudaTextureObject_t tex3DLayObj) //-ju-0202-2022 texture object
+{
+	//-ju-09-Dec-2015
+	float vst[MAPPING];
+	for (int i = 0; i < MAPPING; i++)
+	{
+		vst[i] = 0.0f;
+	}
+	// map from threadIdx/BlockIdx to pixel position
+	int x = threadIdx.x + blockIdx.x * blockDim.x;
+	int z = threadIdx.y + blockIdx.y * blockDim.y;
+
+	Point interpolPoint;
+	VolType vox;
+
+	float phi;
+	vox.x = (float)x + 0.5f; vox.y = (float)y_c + 0.5f; vox.z = (float)z + 0.5f;
+
+	int volWidth_loc = volWidth;
+	int volDepth_loc = volDepth;
+	float xOffset_loc = xOffset;
+	float yOffset_loc = yOffset;
+	float discr = sqrtf((x - volWidth_loc / 2.0f)*(x - volWidth_loc / 2.0f) + (z - volWidth_loc / 2.0f)*(z - volWidth_loc / 2.0f));
+	if (x < volWidth_loc && z < volDepth_loc /*&& discr < volWidth_loc / 2.0f*/)
+	{
+		float l_weight = 0.0f;
+		for (int i = 0; i < fdkConst.projProcSize; i++)
+		{
+			phi = fdkConst.angleIncr*(cuProjBlockIdx*fdkConst.projProcSize + i);
+
+			//-ju-08-Dec-2015
+			for (int k = 0; k < MAPPING; k++)
+			{
+				GetInterpolationPoint(vox, interpolPoint, phi, l_weight, winOrigX, winOrigY, winOrigZ);
+				vst[k] += tex2DLayeredHighPrec(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
+				vox.y = vox.y + 1.0f;
+			}
+			vox.y = (float)y_c + 0.5f;
+		}
+		for (int k = 0; k < MAPPING; k++)
+		{
+			d_backProj[x + z * volWidth + k * volWidth*volDepth] += vst[k];
+		};
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// reconstruction with 3D-window and none equal sized projection blocks (with remainder)
+// Kernel using more accurate bi-linear interpolation
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+__global__ void fdk_kernel_3DW_R_HA(float *d_backProj,    // accumulated back projected slice
+	int    y_c,           // current y-slice
+	int    cuProjBlockIdx, // current projection block index to use
+	int	cuProjBlocksize,
+	int    volWidth,
+	int	volDepth,
+	float  xOffset,
+	float  yOffset,
+	float  winOrigX,
+	float  winOrigY,
+	float  winOrigZ,
+	cudaTextureObject_t tex3DLayObj) //-ju-02-02-2022 texture object
+{
+	//-ju-09-Dec-2015
+	float vst[MAPPING];
+	for (int i = 0; i < MAPPING; i++)
+	{
+		vst[i] = 0.0f;
+	}
+	// map from threadIdx/BlockIdx to pixel position
+	int x = threadIdx.x + blockIdx.x * blockDim.x;
+	int z = threadIdx.y + blockIdx.y * blockDim.y;
+
+	Point interpolPoint;
+	VolType vox;
+
+	float phi;
+	vox.x = (float)x + 0.5f; vox.y = (float)y_c + 0.5f; vox.z = (float)z + 0.5f;
+
+	int volWidth_loc = volWidth;
+	int volDepth_loc = volDepth;
+	float xOffset_loc = xOffset;
+	float yOffset_loc = yOffset;
+	float discr = sqrtf((x - volWidth_loc / 2.0f)*(x - volWidth_loc / 2.0f) + (z - volWidth_loc / 2.0f)*(z - volWidth_loc / 2.0f));
+	if (x < volWidth_loc && z < volDepth_loc /*&& discr < volWidth_loc / 2.0f*/)
+	{
+		float l_weight = 0.0f;
+		for (int i = 0; i < cuProjBlocksize; i++)
+		{
+			phi = fdkConst.angleIncr*(cuProjBlockIdx*fdkConst.projProcSize + i);
+
+			//-ju-08-Dec-2015
+			for (int k = 0; k < MAPPING; k++)
+			{
+				GetInterpolationPoint(vox, interpolPoint, phi, l_weight, winOrigX, winOrigY, winOrigZ);
+				vst[k] += tex2DLayeredHighPrec(tex3DLayObj, interpolPoint.x + xOffset_loc, interpolPoint.y + yOffset_loc, i)*l_weight;
+				vox.y = vox.y + 1.0f;
+			}
+			vox.y = (float)y_c + 0.5f;
+
+		}
+		for (int k = 0; k < MAPPING; k++)
+		{
+			d_backProj[x + z * volWidth + k * volWidth*volDepth] += vst[k];
+		};
+	}
+}
 
 #endif // _RECON_FDK_KERNEL_H
