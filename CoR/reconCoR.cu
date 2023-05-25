@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #include "reconFDK_kernelCoR.cuh"
@@ -282,12 +282,13 @@ extern "C"
             }
             io_stop = clock();
             io_time += (float)(io_stop - io_start) / CLOCKS_PER_SEC;
+			
             cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32,0,0,0,cudaChannelFormatKindFloat);
             //-ju- device memory of sinogram data
             cudaArray *d_sino;
             //-ju- allocate memory holding texture device memory
-			const cudaExtent volumeSize = make_cudaExtent((size_t)param.imgWidth, (size_t)param.imgHeight, (size_t)nProjUse);
-            HANDLE_ERROR(cudaMalloc3DArray(&d_sino, &channelDesc, volumeSize, cudaArrayLayered));
+	    	const cudaExtent volumeSize = make_cudaExtent((size_t)param.imgWidth, (size_t)param.imgHeight, (size_t)nProjUse);
+            checkCudaErrors(cudaMalloc3DArray(&d_sino, &channelDesc, volumeSize, cudaArrayLayered));
             //-ju- copy memory host to device
             cudaMemcpy3DParms copyParams = {0};
 			copyParams.srcPos = make_cudaPos((size_t)0, (size_t)0, (size_t)0);
@@ -299,45 +300,38 @@ extern "C"
                 volumeSize.width*sizeof(float),
                 volumeSize.width,
                 volumeSize.height);
-            HANDLE_ERROR(cudaMemcpy3D(&copyParams));
-
-			cudaResourceDesc    texRes;
+            checkCudaErrors(cudaMemcpy3D(&copyParams));
+			
+	    	cudaTextureObject_t tex3DLayObj = 0;
+			cudaResourceDesc texRes;
 			memset(&texRes, 0, sizeof(cudaResourceDesc));
+
 			texRes.resType = cudaResourceTypeArray;
 			texRes.res.array.array = d_sino;
-			cudaTextureDesc     texDescr;
+
+			cudaTextureDesc texDescr;
 			memset(&texDescr, 0, sizeof(cudaTextureDesc));
+
 			texDescr.normalizedCoords = false;
-			texDescr.filterMode = cudaFilterModeLinear;       // bi-linear filtering of pixels 
-			texDescr.addressMode[0] = cudaAddressModeBorder;  // value out of border is 0  
+			texDescr.filterMode = cudaFilterModeLinear;
+			texDescr.addressMode[0] = cudaAddressModeBorder;
 			texDescr.addressMode[1] = cudaAddressModeBorder;
-			texDescr.addressMode[2] = cudaAddressModeBorder;
 			texDescr.readMode = cudaReadModeElementType;
 
-			// cuda resource description
-			struct cudaResourceDesc resDesc;
-			memset(&resDesc, 0, sizeof(resDesc));
-			resDesc.resType = cudaResourceTypeArray;
-			resDesc.res.array.array = d_sino;
-			// Specify texture object parameters
-			struct cudaTextureDesc texDesc;
-			memset(&texDesc, 0, sizeof(texDesc));
-			// create texture object
-			cudaTextureObject_t tex3DLayObj = 0;
-			cudaCreateTextureObject(&tex3DLayObj, &resDesc, &texDesc, NULL);
+			checkCudaErrors(cudaCreateTextureObject(&tex3DLayObj, &texRes, &texDescr, NULL));
 
             int index = 0;
             for(int iy=yChunkStart; iy<yChunkEnd; iy++)
             {
                 //-ju- allocate memory for one backprojection slice on device
                 float *d_backProj;
-                HANDLE_ERROR(cudaMalloc( (void**)&d_backProj, param.volX*param.volZ*sizeof(float)));
+                checkCudaErrors(cudaMalloc( (void**)&d_backProj, param.volX*param.volZ*sizeof(float)));
 
                 unsigned long long offset = (unsigned long long)param.volX*(unsigned long long)param.volZ*(unsigned long long)index;
-                cudaMemcpy(d_backProj,
+                checkCudaErrors(cudaMemcpy(d_backProj,
                     (char*)&h_backproj_chunk[offset], 
                     param.volX*param.volZ*sizeof(float),
-                    cudaMemcpyHostToDevice);
+                    cudaMemcpyHostToDevice));
 
                 //////////////////////////////////
 				//-ju- Run Backprojection Kernel
@@ -353,7 +347,7 @@ extern "C"
                 /////////////////////////////////
                  if(hasRemainder && np == proj_blcks-1) // process remainder
                 {
-                    fdk_kernel_3DW_R<<<blocks,threads>>>(d_backProj, y_c, 
+                    fdk_kernel_3DW_R_HA<<<blocks,threads>>>(d_backProj, y_c, 
                         cuProjBlockIdx, remainProj, 
                         param.volX, param.volZ, 
                         horizShift, param.shiftY, 
@@ -364,7 +358,7 @@ extern "C"
                 {
                     //-ju-05-03-2014 standard kernel
                     ////////////////////////////////
-                    fdk_kernel_3DW<<<blocks,threads>>>(d_backProj, y_c, 
+                    fdk_kernel_3DW_HA<<<blocks,threads>>>(d_backProj, y_c, 
                         cuProjBlockIdx, 
                         param.volX, param.volZ, 
                         horizShift, param.shiftY, 
@@ -374,15 +368,15 @@ extern "C"
 
                 getLastCudaError("Kernel execution failed");
 
-                cudaMemcpy((char*)&h_backproj_chunk[offset], d_backProj, (size_t)param.volX*param.volZ*sizeof(float), cudaMemcpyDeviceToHost);
+                checkCudaErrors(cudaMemcpy((char*)&h_backproj_chunk[offset], d_backProj, (size_t)param.volX*param.volZ*sizeof(float), cudaMemcpyDeviceToHost));
                 //-ju- free memory for one z-slice
-                HANDLE_ERROR(cudaFree(d_backProj));
+                checkCudaErrors(cudaFree(d_backProj));
                 index++;
             }
 
             //-ju- free device memory used for sinograms (chunks wise)
-            HANDLE_ERROR(cudaFreeArray(d_sino));
-
+			checkCudaErrors(cudaDestroyTextureObject(tex3DLayObj));
+            checkCudaErrors(cudaFreeArray(d_sino));
         }
 
 
