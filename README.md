@@ -12,7 +12,11 @@ Reconstruction Tool Chain for Arbitrary Sized Data Sets and Its
 GPU Optimization](https://doi.org/10.3390/jimaging8010012) and
 [An In-House Cone-Beam Tomographic Reconstruction Package for Laboratory X-ray Phase-Contrast Imaging](http://dx.doi.org/10.3390/app12031430).
 
-For build instructions see: ***build_info.md***
+<ins>For build instructions see:</ins> ***build_info.md***
+
+<ins>For News see:</ins> ***News.md***  
+
+
 
 
 **Currently the following modules are available:**
