@@ -6,7 +6,7 @@ compiled, linked and tested using the following libraries:
 + opencv 4.5.x: <https://opencv.org>
 + qt 5.15.x: <https://www.qt.io/download>
 + qwt 6.1.2 (or newer): <https://sourceforge.net/projects/qwt/files/qwt/>
-+ Cuda toolkit 10.1: <https://developer.nvidia.com/cuda-10.1-download-archive-update2>
++ Cuda toolkit 10.1 (or newer): <https://developer.nvidia.com/cuda-10.1-download-archive-update2>
 + eigen 3.4: <https://eigen.tuxfamily.org>
 + arrayfire 3.7 (or newer): <https://arrayfire.com/download/>
 
