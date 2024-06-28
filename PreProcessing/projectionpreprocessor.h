@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2015], Empa, Juergen Hofmann
+*  Copyright Â© [2015], Empa, Juergen Hofmann
 */
 
 #ifndef _PROJECTIONPREPROCESSOR_H
@@ -114,6 +114,9 @@ private:
 
 	bool TileProjections(const uint32_t NumTiles);
 
+	//-ju-25-June-2024
+	void Calc_Sigmoid_weight(std::vector<float>& weight, const uint32_t extend, float slope);
+
 private slots:
 	void I_SelectInputFiles();
 	void I_LoadInputData();
@@ -182,6 +185,11 @@ private slots:
 
 	//-ju-15-Feb-2018 add clockwise
 	void ChangeDirection();
+
+	//-ju-24-Juni-2024 local tomography
+	void LocalTomoEnable();
+	void LocTomoPercentage();
+	void AVGRange();
 
 public:
 	void DisableAllCntrl();
