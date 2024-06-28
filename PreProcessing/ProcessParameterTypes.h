@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2015], Empa, Juergen Hofmann
+*  Copyright Â© [2015], Empa, Juergen Hofmann
 */
 
 #ifndef _PROCESS_PARAMETER_TYPES_H
@@ -85,6 +85,15 @@ struct ProcessParameter
 	//-ju-23-Feb-2018 already dark/flat corrected projections
 	uint32_t	isDarkFlatCorrected;
 	double		maxGreyInStack;
+	//-ju-24-June-2024 local tomography
+	uint32_t roiPrecentageExt;
+	uint32_t extentedProjectionWidth;
+	uint32_t roiPadSize;
+	uint32_t totalPadLocTomoSize;
+	uint32_t useROIPadding;
+	uint32_t locTomoAVGRange;
+	float sigmoidSlope;
+	std::vector<float> localTomoWeights;
 };
 
 #endif // _PROCESS_PARAMETER_TYPES_H
