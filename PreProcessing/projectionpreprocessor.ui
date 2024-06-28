@@ -1044,6 +1044,155 @@
                     </widget>
                    </item>
                    <item>
+                    <widget class="QGroupBox" name="groupBox_7">
+                     <property name="title">
+                      <string>Extend projection for local tomography</string>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_26">
+                      <item>
+                       <widget class="QCheckBox" name="checkBox_local_tomo">
+                        <property name="text">
+                         <string>Local tomography</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_33">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_11">
+                        <property name="text">
+                         <string>Extend width</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_roi_percentage">
+                        <property name="maximum">
+                         <number>100</number>
+                        </property>
+                        <property name="value">
+                         <number>20</number>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_13">
+                        <property name="text">
+                         <string>%</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_34">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_10">
+                        <property name="text">
+                         <string>Resulting width:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="lineEdit_roi_show_width">
+                        <property name="maximumSize">
+                         <size>
+                          <width>70</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_35">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_14">
+                        <property name="text">
+                         <string>AVG range</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_AVG_range">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="maximum">
+                         <number>100</number>
+                        </property>
+                        <property name="value">
+                         <number>3</number>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_36">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_12">
+                        <property name="text">
+                         <string>Slope factor:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_sigmoid_slope">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="decimals">
+                         <number>3</number>
+                        </property>
+                        <property name="maximum">
+                         <double>10.000000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QGroupBox" name="groupBox_SaveData">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -1627,8 +1776,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>694</width>
-                 <height>316</height>
+                 <width>558</width>
+                 <height>175</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1832,8 +1981,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>694</width>
-                 <height>316</height>
+                 <width>398</width>
+                 <height>157</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2046,8 +2195,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>694</width>
-                 <height>316</height>
+                 <width>233</width>
+                 <height>96</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2137,8 +2286,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>694</width>
-                 <height>316</height>
+                 <width>327</width>
+                 <height>93</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -3206,22 +3355,6 @@
  </resources>
  <connections>
   <connection>
-   <sender>comboBox_MethodSelection</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>stackedWidget_MethodsParameter</receiver>
-   <slot>setCurrentIndex(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>348</x>
-     <y>666</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>249</x>
-     <y>713</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionExit</sender>
    <signal>triggered(bool)</signal>
    <receiver>ProjectionPreProcessorClass</receiver>
@@ -3250,70 +3383,6 @@
     <hint type="destinationlabel">
      <x>817</x>
      <y>688</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_NormWinWidth</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_WinWidth</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>289</x>
-     <y>747</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1204</x>
-     <y>949</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_NormWinHeight</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_WinHeight</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>289</x>
-     <y>773</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1206</x>
-     <y>977</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_NormWinXPos</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_xWinPos</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>146</x>
-     <y>747</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1025</x>
-     <y>949</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_NormWinYPos</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_yWinPos</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>146</x>
-     <y>773</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1025</x>
-     <y>977</y>
     </hint>
    </hints>
   </connection>
@@ -3378,6 +3447,86 @@
     <hint type="destinationlabel">
      <x>480</x>
      <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_NormWinHeight</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_WinHeight</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>289</x>
+     <y>773</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1206</x>
+     <y>977</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_NormWinYPos</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_yWinPos</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>146</x>
+     <y>773</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1025</x>
+     <y>977</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_MethodSelection</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackedWidget_MethodsParameter</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>348</x>
+     <y>666</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>713</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_NormWinWidth</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_WinWidth</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>289</x>
+     <y>747</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1204</x>
+     <y>949</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_NormWinXPos</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_xWinPos</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>146</x>
+     <y>747</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1025</x>
+     <y>949</y>
     </hint>
    </hints>
   </connection>
