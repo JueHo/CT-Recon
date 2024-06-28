@@ -1818,7 +1818,18 @@ void ThreadProcessing::SaveProjections(float *VolMem)
 				emit valueChanged(msg);
 				return;
 			}
-			projectionFile.write((char*)&VolMem[offset], sz*dataTypeSize);
+			if (m_procPara.useROIPadding)
+			{
+				//-ju-24-June-2024 process prepare projections for local tomography
+				std::vector<float> projectionPad; // resize before??
+				projectionPad.resize(m_procPara.totalPadLocTomoSize * m_procPara.imgHeight);
+				ApplyROIPadding(&VolMem[offset], projectionPad);
+				projectionFile.write((char*)&projectionPad[0], m_procPara.totalPadLocTomoSize * m_procPara.imgHeight * sizeof(float));
+			}
+			else
+			{
+				projectionFile.write((char*)&VolMem[offset], sz * dataTypeSize);
+			}
 			projectionFile.close();
 			emit updateProgressBar(i + 1);
 		}
@@ -1993,4 +2004,109 @@ void ThreadProcessing::ApplyLorentzFilter(cv::Mat &image, float *filterKernelRaw
 	mem.resize(m_procPara.imgWidth*m_procPara.imgHeight);
 	filt_img_real.host(&mem[0]);
 	memcpy(image.data, &mem[0], m_procPara.imgWidth*m_procPara.imgHeight * sizeof(float));
+}
+
+void ThreadProcessing::ApplyROIPadding(float* projection, std::vector<float> &projection_pad)
+{
+	// filter width used in ring artefact correction
+	// Currently fixed to 32 pixels.
+	// Must be subtracted from projection width to avoid additionally artefacts.
+	// Will be modified in future
+	//////////////////////////////////////////////////////////////////////////////
+	/*
+const int num_proj = 1792;
+const int height = 1344;
+const int width = 2016;
+
+// take average gray value on in image border for extension
+const int average_range = 3;
+
+const float PI = 3.1415927f;
+
+std::vector<float> weight_left, weight_right;
+
+const int ring_art_filter_corr = 32; // currently ring artefact filter has size of 32 pixels (fix) --> values are not valid
+//const int cor_offset_corr = 10; // 2x COR offset (specific for every  scan)
+const int cor_offset_corr = 0; // 2x COR offset (specific for every  scan)
+
+// ??? ==> zum extend dazuaddieren ???
+const int roi_width = width - ring_art_filter_corr - cor_offset_corr;
+// ???
+
+// origin of ROI considering filter width ( ring artefact) plus cutoff (COR correction)
+const int roi_x = ((ring_art_filter_corr + cor_offset_corr) / 2 - 1);
+const int roi_y = 0;
+
+const int extend = roi_width / 4;
+
+	*/
+
+	// take only part of projection without the width of the filter used in the ring artefact
+	// ==> todo for future release parameterize it 
+	////////////////////////////////////////////////////////////////////////////////////////////
+	const uint32_t ring_artefact_filter_width = 32; 
+	const int roi_width = m_procPara.imgWidth - ring_artefact_filter_width;
+
+	std::vector<float> weight_left(m_procPara.localTomoWeights);
+	std::vector<float> weight_right;
+	weight_right.resize(weight_left.size());
+	std::reverse_copy(weight_left.begin(), weight_left.end(), weight_right.begin());
+
+	// allocate memory for projection and extended projection matrix
+	cv::Mat projection_in = cv::Mat::zeros(m_procPara.imgHeight, m_procPara.imgWidth, CV_32F);
+	cv::Mat projection_tmp = cv::Mat::zeros(m_procPara.imgHeight, roi_width, CV_32F);
+	cv::Mat projection_dest = cv::Mat::zeros(projection_in.rows, m_procPara.totalPadLocTomoSize, projection_in.type());
+
+	memcpy(projection_in.data, (char*)projection, m_procPara.imgHeight * m_procPara.imgWidth * sizeof(float));
+
+	// Create ROI from original pre-processed raw image
+	// hard coded for currently used filter width in ring artefact correction of 32
+	////////////////////////////////////////////////////////////////////////////////
+	const uint32_t corr_filter_RAC = 32;
+
+	const int roi_x = corr_filter_RAC/2 - 1;
+	projection_tmp = projection_in(cv::Rect(roi_x, 0, roi_width, projection_tmp.rows));
+
+	for (int ih = 0; ih < projection_tmp.rows; ih++)
+	{
+		float avg_left = 0;
+		float avg_right = 0;
+		for (int i = 0; i < projection_tmp.cols; i++)
+		{
+			if (i < m_procPara.locTomoAVGRange)
+			{
+				float  val = projection_tmp.at<float>(ih, i);
+				avg_left += val;
+			}
+			if (i > projection_tmp.cols - (m_procPara.locTomoAVGRange + 1))
+			{
+				float  val = projection_tmp.at<float>(ih, i);
+				avg_right += val;
+			}
+		}
+		avg_left /= m_procPara.locTomoAVGRange;
+		avg_right /= m_procPara.locTomoAVGRange;
+
+		for (int iw = 0; iw < projection_dest.cols; iw++)
+		{
+			// attach to left side
+			if (iw < m_procPara.roiPadSize)
+			{
+				float val = weight_left[iw] * avg_left;
+				projection_dest.at<float>(ih, iw) = val;
+				//dgb_cnt++;
+			}
+			if (iw >= m_procPara.roiPadSize && iw < projection_dest.cols - (m_procPara.roiPadSize + 1))
+			{
+				projection_dest.at<float>(ih, iw) = projection_tmp.at<float>(ih, iw - m_procPara.roiPadSize);
+			}
+			// attach to right side
+			if (iw > projection_dest.cols - (m_procPara.roiPadSize + 1))
+			{
+				float val = weight_right[iw - (projection_tmp.cols + m_procPara.roiPadSize)] * avg_right;
+				projection_dest.at<float>(ih, iw - 1) = val;
+			}
+		}
+	}
+	memcpy((char*)projection_pad.data(), projection_dest.data, projection_dest.rows * projection_dest.cols * sizeof(float));
 }
