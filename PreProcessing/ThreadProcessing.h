@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2015], Empa, Juergen Hofmann
+*  Copyright Â© [2015], Empa, Juergen Hofmann
 */
 
 #ifndef _THREAD_PROCESSING_H
@@ -75,6 +75,8 @@ private:
 	//-ju-11-Apr-2017
 	void LorentzFilterKernel(float *pFilterArray, int32_t szX, int32_t szY);
 	void ApplyLorentzFilter(cv::Mat &image, float *filterKernelRaw, float *pTemp);
+	//-ju-24-June-2024 local tomography
+	void ApplyROIPadding(float *projection, std::vector<float> &projection_pad);
 
 
 private:
