@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2015], Empa, Juergen Hofmann
+*  Copyright Â© [2015], Empa, Juergen Hofmann
 */
 
 #include "projectionpreprocessor.h"
@@ -36,6 +36,9 @@ ProjectionPreProcessor::ProjectionPreProcessor(QWidget *parent)
 	m_processingParam.antiClockWise = 0;
 
 	m_processingParam.maxGreyInStack = 0.0;
+
+	//-ju-25-June-2024
+	m_processingParam.useROIPadding = 0;
 
 
 
@@ -164,6 +167,14 @@ ProjectionPreProcessor::ProjectionPreProcessor(QWidget *parent)
 	//-ju-21-Oct-2015 add checkbox signal handler for disabling logarithm
 	// save data
 	connect(ui.pushButton_SaveDataStart, &QPushButton::clicked, this, &ProjectionPreProcessor::RunSaving);
+
+	// local tomography
+	/////////////////////
+	connect(ui.checkBox_local_tomo, &QCheckBox::stateChanged, this, &ProjectionPreProcessor::LocalTomoEnable);
+	void (QSpinBox::* signalSpinLocTomo)(int) = &QSpinBox::valueChanged;
+	connect(ui.spinBox_roi_percentage, signalSpinLocTomo, this, &ProjectionPreProcessor::LocTomoPercentage);
+	void (QSpinBox::* signalSpinAVGRange)(int) = &QSpinBox::valueChanged;
+	connect(ui.spinBox_roi_percentage, signalSpinAVGRange, this, &ProjectionPreProcessor::AVGRange);
 
 	// image view
 	///////////////
@@ -574,8 +585,8 @@ void ProjectionPreProcessor::About()
 {
 	QMessageBox::information(this, 
 		tr("Version Information"), 
-		tr("Pre-processor Version 2.0.0 \n"
-			"Februar 2019\n"
+		tr("Pre-processor Version 2.1.0 \n"
+			"June 2024\n"
 			"Copyright (c) Empa 2015. Center for X-ray Analytics\n"
 			"Author: Juergen Hofmann"), 
 		QMessageBox::Ok);
@@ -1383,6 +1394,27 @@ void ProjectionPreProcessor::I_LoadInputData()
 		return;
 	}
 
+	//-ju-24-June-2024 calc. roi width
+	uint32_t percentage = ui.spinBox_roi_percentage->value();
+	uint32_t width = ui.spinBox_ProjectionWidth->value();
+	m_processingParam.roiPadSize = width * percentage / 100;
+	// hard coded for currently used filter width in ring artefact correction of 32
+	////////////////////////////////////////////////////////////////////////////////
+	const uint32_t corr_filter_RAC = 32;
+	width = 2*width * percentage / 100 + width - corr_filter_RAC;
+	m_processingParam.totalPadLocTomoSize = width;
+	QString projection_width; 
+	projection_width.sprintf("%d", width);
+	ui.lineEdit_roi_show_width->setText(projection_width);
+	// automatically estimate slope factor for the sigmoid
+	m_processingParam.sigmoidSlope = 20.0f / static_cast<float>(m_processingParam.roiPadSize);
+	ui.doubleSpinBox_sigmoid_slope->setValue(m_processingParam.sigmoidSlope);
+	// store average range
+	m_processingParam.locTomoAVGRange = ui.spinBox_AVG_range->value();
+	// calculate weights for roi tomo padding
+	Calc_Sigmoid_weight(m_processingParam.localTomoWeights, m_processingParam.roiPadSize, m_processingParam.sigmoidSlope);
+
+
 	////////////////////////////////////////////////////////////////////////////////////////////
 	//-ju-23-09-2015
 	// switch between memory tile version and none
@@ -1475,7 +1507,7 @@ void ProjectionPreProcessor::I_LoadInputData()
 	if (!CheckAvailableMemory())return;
 
 	//--> memory stack in ProjectionPreProcessor definieren und in thread referenzieren
-	//	tracking des pointers alloc/dealloc --> aendern falls grösse aendert
+	//	tracking des pointers alloc/dealloc --> aendern falls grÃ¶sse aendert
 
 	if (m_inputFileList.size() != ui.spinBox_NumberProjections->value())
 	{
@@ -1674,6 +1706,13 @@ void ProjectionPreProcessor::ClearProjectSettings()
 	m_processingParam.correctAlgo = 0;
 	m_processingParam.outlierSigmaMedian9 = 6.0;
 	m_processingParam.outlierSigmaMean9 = 6.0;
+
+	// local/ROI tomography (add 24-June-2024)
+	//////////////////////////////////////////
+	ui.checkBox_local_tomo->setChecked(false);
+	ui.lineEdit_roi_show_width->setEnabled(false);
+	ui.spinBox_roi_percentage->setEnabled(false);
+
 
 	// method selection -> BHC
 	/////////////////////////////////
@@ -2634,3 +2673,54 @@ void ProjectionPreProcessor::DarkFlatCorrectedStateChanged()
 	}
 }
 
+//-ju-24-June-2024 local tomography
+void ProjectionPreProcessor::LocalTomoEnable()
+{
+	if (ui.checkBox_local_tomo->isChecked())
+	{
+		ui.spinBox_roi_percentage->setEnabled(true);
+		ui.spinBox_AVG_range->setEnabled(true);
+		m_processingParam.useROIPadding = 1;
+	}
+	else
+	{
+		ui.spinBox_roi_percentage->setEnabled(false);
+		ui.spinBox_AVG_range->setEnabled(false);
+		m_processingParam.useROIPadding = 0;
+	}
+}
+
+void ProjectionPreProcessor::LocTomoPercentage()
+{
+	uint32_t percentage = ui.spinBox_roi_percentage->value();
+	uint32_t width = ui.spinBox_ProjectionWidth->value();
+	m_processingParam.roiPadSize = width * percentage / 100;
+	// hard coded for currently used filter width in ring artefact correction of 32
+	////////////////////////////////////////////////////////////////////////////////
+	const uint32_t corr_filter_RAC = 32;
+	width = 2 * width * percentage / 100 + width - corr_filter_RAC;
+	m_processingParam.totalPadLocTomoSize = width;
+	QString projection_width;
+	projection_width.sprintf("%d", width);
+	ui.lineEdit_roi_show_width->setText(projection_width);
+	// automatically estimate slope factor for the sigmoid
+	m_processingParam.sigmoidSlope = 20.0f / static_cast<float>(m_processingParam.roiPadSize);
+	ui.doubleSpinBox_sigmoid_slope->setValue(m_processingParam.sigmoidSlope);
+	Calc_Sigmoid_weight(m_processingParam.localTomoWeights, m_processingParam.roiPadSize, m_processingParam.sigmoidSlope);
+}
+
+void ProjectionPreProcessor::Calc_Sigmoid_weight(std::vector<float>& weight, const uint32_t extend, float slope)
+{
+	weight.clear();
+	float center = extend / 2.0f;
+	for (int i = 0; i < extend; i++)
+	{
+		float val = 1.0f / (1.0f + exp(-slope * (i - center)));
+		weight.push_back(val);
+	}
+}
+
+void ProjectionPreProcessor::AVGRange()
+{
+	m_processingParam.locTomoAVGRange = ui.spinBox_AVG_range->value();
+}
