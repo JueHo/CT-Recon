@@ -1,13 +1,13 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #ifndef _CONVERT_H
 #define _CONVERT_H
-
-#include <cfloat>
-#include <climits>
-#include <algorithm>
+//#include <cfloat>
+//#include <climits>
+//#include <algorithm>
+#include "typesFDK.h"
 
 //-ju-27-Feb-2014 multithreaded version
 #ifdef _OPENMP
@@ -69,8 +69,8 @@ void ConvertTomoDataI16(const BackProjParam &param, const float &tomoMax, const 
 {
 	float mapRange = (SHRT_MAX - SHRT_MIN)/(tomoMax - tomoMin);
 	int tomoSize = param.volX*param.volZ;
-	ifstream tomoReal;
-	ofstream tomoShort;
+	std::ifstream tomoReal;
+	std::ofstream tomoShort;
 	char tomgramFile[500];
 	char tomgramFileConvert[500];
 	int onePercent = param.volY/100;
@@ -85,26 +85,26 @@ void ConvertTomoDataI16(const BackProjParam &param, const float &tomoMax, const 
 			param.tomoDir.c_str(),param.tomoName.c_str(),
 			param.volX,param.volY,param.volZ,
 			i+param.startIndex);
-		tomoReal.open(tomgramFile, ios::binary);
+		tomoReal.open(tomgramFile, std::ios::binary);
 		if(!tomoReal.is_open())
 		{
 			cout << "Can not open " << tomgramFile << "  -  Exit program!\n";
 			return;
 		}
-		vector<float> readDataVector(tomoSize);
+		std::vector<float> readDataVector(tomoSize);
 		if(!tomoReal.read((char*)&readDataVector[0], tomoSize*sizeof(float)))
 		{
 			cout << "\nError writing tomogram\n";
 			return;
 		}
 		tomoReal.close();
-		vector<short> mapShort(readDataVector.size());
-		transform(readDataVector.begin(), readDataVector.end(), mapShort.begin(), RangeMapI16(mapRange, tomoMin));
+		std::vector<short> mapShort(readDataVector.size());
+		std::transform(readDataVector.begin(), readDataVector.end(), mapShort.begin(), RangeMapI16(mapRange, tomoMin));
 		sprintf(tomgramFileConvert,"%s.i16",tomgramFile);
-		tomoShort.open(tomgramFileConvert, ios::binary);
+		tomoShort.open(tomgramFileConvert, std::ios::binary);
 		if(!tomoShort.is_open())
 		{
-			cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
 			return;
 		}
 		tomoShort.write((char*)&mapShort[0],tomoSize*sizeof(short));
@@ -113,7 +113,7 @@ void ConvertTomoDataI16(const BackProjParam &param, const float &tomoMax, const 
 		{
 			if(remove(tomgramFile))
 			{
-				cout << "Can not delete file: " << tomgramFile << endl;
+				std::cout << "Can not delete file: " << tomgramFile << endl;
 			}
 		}
 		if(i%onePercent == 0)
@@ -148,23 +148,23 @@ void ConvertTomoDataUI16(const BackProjParam &param, const float &tomoMax, const
 		tomoReal.open(tomgramFile, ios::binary);
 		if(!tomoReal.is_open())
 		{
-			cout << "Can not open " << tomgramFile << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFile << "  -  Exit program!\n";
 			return;
 		}
-		vector<float> readDataVector(tomoSize);
+		std::vector<float> readDataVector(tomoSize);
 		if(!tomoReal.read((char*)&readDataVector[0], tomoSize*sizeof(float)))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			return;
 		}
 		tomoReal.close();
-		vector<unsigned short> mapUShort(readDataVector.size());
-		transform(readDataVector.begin(), readDataVector.end(), mapUShort.begin(), RangeMapUI16(mapRange, tomoMin));
+		std::vector<unsigned short> mapUShort(readDataVector.size());
+		std::transform(readDataVector.begin(), readDataVector.end(), mapUShort.begin(), RangeMapUI16(mapRange, tomoMin));
 		sprintf(tomgramFileConvert,"%s.ui16",tomgramFile);
 		tomoUShort.open(tomgramFileConvert, ios::binary);
 		if(!tomoUShort.is_open())
 		{
-			cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
 			return;
 		}
 		tomoUShort.write((char*)&mapUShort[0],tomoSize*sizeof(unsigned short));
@@ -173,7 +173,7 @@ void ConvertTomoDataUI16(const BackProjParam &param, const float &tomoMax, const
 		{
 			if(remove(tomgramFile))
 			{
-				cout << "Can not delete file: " << tomgramFile << endl;
+				std::cout << "Can not delete file: " << tomgramFile << endl;
 			}
 		}
 		if(i%onePercent == 0)
@@ -200,8 +200,8 @@ void ConvertTomoDataUI16MT(const BackProjParam &param, const float &tomoMax, con
 #pragma omp parallel for shared(mapRange,tomoSize,i)
 	for(i = 0; i<param.volY; i++)
 	{
-		ifstream tomoReal;
-		ofstream tomoUShort;
+		std::ifstream tomoReal;
+		std::ofstream tomoUShort;
 		char tomgramFile[500];
 		char tomgramFileConvert[500];
 		sprintf(tomgramFile,"%s%s%04dx%04dx%04d_%04d.raw", 
@@ -211,23 +211,23 @@ void ConvertTomoDataUI16MT(const BackProjParam &param, const float &tomoMax, con
 		tomoReal.open(tomgramFile, ios::binary);
 		if(!tomoReal.is_open())
 		{
-			cout << "Can not open " << tomgramFile << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFile << "  -  Exit program!\n";
 			//??return;
 		}
-		vector<float> readDataVector(tomoSize);
+		std::vector<float> readDataVector(tomoSize);
 		if(!tomoReal.read((char*)&readDataVector[0], tomoSize*sizeof(float)))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			//??return;
 		}
 		tomoReal.close();
-		vector<unsigned short> mapUShort(readDataVector.size());
-		transform(readDataVector.begin(), readDataVector.end(), mapUShort.begin(), RangeMapUI16(mapRange, tomoMin));
+		std::vector<unsigned short> mapUShort(readDataVector.size());
+		std::transform(readDataVector.begin(), readDataVector.end(), mapUShort.begin(), RangeMapUI16(mapRange, tomoMin));
 		sprintf(tomgramFileConvert,"%s.ui16",tomgramFile);
 		tomoUShort.open(tomgramFileConvert, ios::binary);
 		if(!tomoUShort.is_open())
 		{
-			cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
 			//??return;
 		}
 		tomoUShort.write((char*)&mapUShort[0],tomoSize*sizeof(unsigned short));
@@ -236,7 +236,7 @@ void ConvertTomoDataUI16MT(const BackProjParam &param, const float &tomoMax, con
 		{
 			if(remove(tomgramFile))
 			{
-				cout << "Can not delete file: " << tomgramFile << endl;
+				std::cout << "Can not delete file: " << tomgramFile << endl;
 			}
 		}
 		if(i%onePercent == 0)
@@ -317,8 +317,8 @@ void ConvertTomoDataUC8(const BackProjParam &param, const float &tomoMax, const 
 {
 	float mapRange = UCHAR_MAX/(tomoMax - tomoMin);
 	int tomoSize = param.volX*param.volZ;
-	ifstream tomoReal;
-	ofstream tomoByte;
+	std::ifstream tomoReal;
+	std::ofstream tomoByte;
 	char tomgramFile[500];
 	char tomgramFileConvert[500];
 	int onePercent = param.volY/100;
@@ -335,23 +335,23 @@ void ConvertTomoDataUC8(const BackProjParam &param, const float &tomoMax, const 
 		tomoReal.open(tomgramFile, ios::binary);
 		if(!tomoReal.is_open())
 		{
-			cout << "Can not open " << tomgramFile << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFile << "  -  Exit program!\n";
 			return;
 		}
-		vector<float> readDataVector(tomoSize);
+		std::vector<float> readDataVector(tomoSize);
 		if(!tomoReal.read((char*)&readDataVector[0], tomoSize*sizeof(float)))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			return;
 		}
 		tomoReal.close();
-		vector<unsigned char> mapByte(readDataVector.size());
-		transform(readDataVector.begin(), readDataVector.end(), mapByte.begin(), RangeMapUC8(mapRange, tomoMin));
+		std::vector<unsigned char> mapByte(readDataVector.size());
+		std::transform(readDataVector.begin(), readDataVector.end(), mapByte.begin(), RangeMapUC8(mapRange, tomoMin));
 		sprintf(tomgramFileConvert,"%s.uc8",tomgramFile);
 		tomoByte.open(tomgramFileConvert, ios::binary);
 		if(!tomoByte.is_open())
 		{
-			cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
 			return;
 		}
 		tomoByte.write((char*)&mapByte[0],tomoSize*sizeof(unsigned char));
@@ -360,7 +360,7 @@ void ConvertTomoDataUC8(const BackProjParam &param, const float &tomoMax, const 
 		{
 			if(remove(tomgramFile))
 			{
-				cout << "Can not delete file: " << tomgramFile << endl;
+				std::cout << "Can not delete file: " << tomgramFile << endl;
 			}
 		}
 		if(i%onePercent == 0)
@@ -384,15 +384,15 @@ void ConvertBlockTomoDataUC8(const BackProjParam &param,
 		return;
 	}
 
-	ofstream tomoByte;
+	std::ofstream tomoByte;
 	char tomgramFile[500];
 	char tomgramFileConvert[500];
 
 	unsigned int sliceSize = param.volX*param.volZ;
 	// input data
-	vector<float> readDataVector(sliceSize);
+	std::vector<float> readDataVector(sliceSize);
 	// output data
-	vector<unsigned char> mapByte(sliceSize);
+	std::vector<unsigned char> mapByte(sliceSize);
 	float mapRange = UCHAR_MAX/(tomoMax - tomoMin);
 	float *bufferIn  = new float[sliceSize];
 
@@ -411,12 +411,12 @@ void ConvertBlockTomoDataUC8(const BackProjParam &param,
 		_fseeki64(fpVol,fileOffset*sizeof(float),0);
 		if(!fread(bufferIn, sliceSize*sizeof(float),1,fpVol))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			return;
 		}
 		// copy array to vector
 		readDataVector.assign(bufferIn,bufferIn+sliceSize);
-		transform(readDataVector.begin(), readDataVector.end(), mapByte.begin(), RangeMapUC8(mapRange, tomoMin));
+		std::transform(readDataVector.begin(), readDataVector.end(), mapByte.begin(), RangeMapUC8(mapRange, tomoMin));
 
 		sprintf(tomgramFileConvert,"%s.uc8",tomgramFile);
 		tomoByte.open(tomgramFileConvert, ios::binary);
@@ -431,7 +431,7 @@ void ConvertBlockTomoDataUC8(const BackProjParam &param,
 		{
 			if(remove(tomgramFile))
 			{
-				cout << "Can not delete file: " << tomgramFile << endl;
+				std::cout << "Can not delete file: " << tomgramFile << endl;
 			}
 		}
 		if(i%onePercent == 0)
@@ -455,15 +455,15 @@ void ConvertBlockTomoDataI16(const BackProjParam &param,
 		return;
 	}
 
-	ofstream tomoShort;
+	std::ofstream tomoShort;
 	char tomgramFile[500];
 	char tomgramFileConvert[500];
 
 	unsigned int sliceSize = param.volX*param.volZ;
 	// input data
-	vector<float> readDataVector(sliceSize);
+	std::vector<float> readDataVector(sliceSize);
 	// output data
-	vector<short> mapShort(sliceSize);
+	std::vector<short> mapShort(sliceSize);
 	float mapRange = (SHRT_MAX - SHRT_MIN)/(tomoMax - tomoMin);
 	float *bufferIn  = new float[sliceSize];
 
@@ -482,18 +482,18 @@ void ConvertBlockTomoDataI16(const BackProjParam &param,
 		_fseeki64(fpVol,fileOffset*sizeof(float),0);
 		if(!fread(bufferIn, sliceSize*sizeof(float),1,fpVol))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			return;
 		}
 		// copy array to vector
 		readDataVector.assign(bufferIn,bufferIn+sliceSize);
-		transform(readDataVector.begin(), readDataVector.end(), mapShort.begin(), RangeMapI16(mapRange, tomoMin));
+		std::transform(readDataVector.begin(), readDataVector.end(), mapShort.begin(), RangeMapI16(mapRange, tomoMin));
 
 		sprintf(tomgramFileConvert,"%s.i16",tomgramFile);
 		tomoShort.open(tomgramFileConvert, ios::binary);
 		if(!tomoShort.is_open())
 		{
-			cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
 			return;
 		}
 		tomoShort.write((char*)&mapShort[0],sliceSize*sizeof(short));
@@ -502,7 +502,7 @@ void ConvertBlockTomoDataI16(const BackProjParam &param,
 		{
 			if(remove(tomgramFile))
 			{
-				cout << "Can not delete file: " << tomgramFile << endl;
+				std::cout << "Can not delete file: " << tomgramFile << endl;
 			}
 		}
 		if(i%onePercent == 0)
@@ -526,13 +526,13 @@ void ConvertBlockTomoDataUI16(const BackProjParam &param,
 		return;
 	}
 
-	ofstream tomoUShort;
+	std::ofstream tomoUShort;
 	char tomgramFile[500];
 	char tomgramFileConvert[500];
 
 	unsigned int sliceSize = param.volX*param.volZ;
 	// input data
-	vector<float> readDataVector(sliceSize);
+	std::vector<float> readDataVector(sliceSize);
 	// output data
 	vector<unsigned short> mapUShort(sliceSize);
 	float mapRange = USHRT_MAX/(tomoMax - tomoMin);
@@ -553,18 +553,18 @@ void ConvertBlockTomoDataUI16(const BackProjParam &param,
 		_fseeki64(fpVol,fileOffset*sizeof(float),0);
 		if(!fread(bufferIn, sliceSize*sizeof(float),1,fpVol))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			return;
 		}
 		// copy array to vector
 		readDataVector.assign(bufferIn,bufferIn+sliceSize);
-		transform(readDataVector.begin(), readDataVector.end(), mapUShort.begin(), RangeMapUI16(mapRange, tomoMin));
+		std::transform(readDataVector.begin(), readDataVector.end(), mapUShort.begin(), RangeMapUI16(mapRange, tomoMin));
 
 		sprintf(tomgramFileConvert,"%s.ui16",tomgramFile);
 		tomoUShort.open(tomgramFileConvert, ios::binary);
 		if(!tomoUShort.is_open())
 		{
-			cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
+			std::cout << "Can not open " << tomgramFileConvert << "  -  Exit program!\n";
 			return;
 		}
 		tomoUShort.write((char*)&mapUShort[0],sliceSize*sizeof(unsigned short));
@@ -573,7 +573,7 @@ void ConvertBlockTomoDataUI16(const BackProjParam &param,
 		{
 			if(remove(tomgramFile))
 			{
-				cout << "Can not delete file: " << tomgramFile << endl;
+				std::cout << "Can not delete file: " << tomgramFile << endl;
 			}
 		}
 		if(i%onePercent == 0)
@@ -598,9 +598,9 @@ void ConvertBlockInternalTomoDataUC8(const BackProjParam &param,
 	}
 	unsigned int sliceSize = param.volX*param.volZ;
 	// input data
-	vector<float> readDataVector(sliceSize);
+	std::vector<float> readDataVector(sliceSize);
 	// output data
-	vector<unsigned char> mapByte(sliceSize);
+	std::vector<unsigned char> mapByte(sliceSize);
 	float mapRange = UCHAR_MAX/(tomoMax - tomoMin);
 
 	float         *bufferIn  = new float[sliceSize];
@@ -618,12 +618,12 @@ void ConvertBlockInternalTomoDataUC8(const BackProjParam &param,
 		_fseeki64(fpVol,fileOffset*sizeof(float),0);
 		if(!fread(bufferIn, sliceSize*sizeof(float),1,fpVol))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			return;
 		}
 		// copy array to vector
 		readDataVector.assign(bufferIn,bufferIn+sliceSize);
-		transform(readDataVector.begin(),readDataVector.end(),mapByte.begin(),RangeMapUC8(mapRange,tomoMin));
+		std::transform(readDataVector.begin(),readDataVector.end(),mapByte.begin(),RangeMapUC8(mapRange,tomoMin));
 		// copy vector to array
 		std::copy(mapByte.begin(),mapByte.end(),bufferOut);
 		_fseeki64(fpVol,fileOffset*sizeof(unsigned char),0);
@@ -653,9 +653,9 @@ void ConvertBlockInternalTomoDataI16(const BackProjParam &param,
 	}
 	unsigned int sliceSize = param.volX*param.volZ;
 	// input data
-	vector<float> readDataVector(sliceSize);
+	std::vector<float> readDataVector(sliceSize);
 	// output data
-	vector<short> mapShort(sliceSize);
+	std::vector<short> mapShort(sliceSize);
 	float mapRange = (SHRT_MAX - SHRT_MIN)/(tomoMax - tomoMin);
 
 	float *bufferIn  = new float[sliceSize];
@@ -673,12 +673,12 @@ void ConvertBlockInternalTomoDataI16(const BackProjParam &param,
 		_fseeki64(fpVol,fileOffset*sizeof(float),0);
 		if(!fread(bufferIn, sliceSize*sizeof(float),1,fpVol))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			return;
 		}
 		// copy array to vector
 		readDataVector.assign(bufferIn,bufferIn+sliceSize);
-		transform(readDataVector.begin(),readDataVector.end(),mapShort.begin(),RangeMapI16(mapRange,tomoMin));
+		std::transform(readDataVector.begin(),readDataVector.end(),mapShort.begin(),RangeMapI16(mapRange,tomoMin));
 		// copy vector to array
 		std::copy(mapShort.begin(),mapShort.end(),bufferOut);
 		_fseeki64(fpVol,fileOffset*sizeof(short),0);
@@ -707,9 +707,9 @@ void ConvertBlockInternalTomoDataUI16(const BackProjParam &param,
 	}
 	unsigned int sliceSize = param.volX*param.volZ;
 	// input data
-	vector<float> readDataVector(sliceSize);
+	std::vector<float> readDataVector(sliceSize);
 	// output data
-	vector<unsigned short> mapUShort(sliceSize);
+	std::vector<unsigned short> mapUShort(sliceSize);
 	float mapRange = USHRT_MAX/(tomoMax - tomoMin);
 
 	float          *bufferIn  = new float[sliceSize];
@@ -727,12 +727,12 @@ void ConvertBlockInternalTomoDataUI16(const BackProjParam &param,
 		_fseeki64(fpVol,fileOffset*sizeof(float),0);
 		if(!fread(bufferIn, sliceSize*sizeof(float),1,fpVol))
 		{
-			cout << "\nError writing tomogram\n";
+			std::cout << "\nError writing tomogram\n";
 			return;
 		}
 		// copy array to vector
 		readDataVector.assign(bufferIn,bufferIn+sliceSize);
-		transform(readDataVector.begin(),readDataVector.end(),mapUShort.begin(),RangeMapUI16(mapRange,tomoMin));
+		std::transform(readDataVector.begin(),readDataVector.end(),mapUShort.begin(),RangeMapUI16(mapRange,tomoMin));
 		// copy vector to array
 		std::copy(mapUShort.begin(),mapUShort.end(),bufferOut);
 		_fseeki64(fpVol,fileOffset*sizeof(unsigned short),0);
