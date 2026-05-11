@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 /**********************************************************
@@ -12,11 +12,10 @@
 **********************************************************/
 #ifndef _FILTEREXCEPTION_H
 #define _FILTEREXCEPTION_H
-
 #include "errormessages.h"
 
 #include <string>
-using namespace std;
+//using namespace std;
 
 class FilterException
 {
@@ -26,15 +25,15 @@ public:
 	{
 	}
 
-	FilterException(const FILTER_ERROR &errNo, string text)
+	FilterException(const FILTER_ERROR &errNo, std::string text)
 		:m_errNo(errNo), m_text(text)
 	{
 	}
 
-	string GetErrorMessage()
+	std::string GetErrorMessage()
 	{
 		int n = 0;
-		string msg = "";
+		std::string msg = "";
 		while(message_table[n].err != err_list_end)
 		{
 			if(message_table[n].err == m_errNo)
@@ -50,6 +49,6 @@ public:
 	}
 private:
 	int    m_errNo;
-	string m_text;
+	std::string m_text;
 };
 #endif
