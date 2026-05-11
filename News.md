@@ -1,4 +1,6 @@
 ## News:
+* <strong>2025-05-11:<strong>
+  Started migration to CUDA 12.9 and Qt 6.x
 * <strong>2025-05-14:<strong> Add prototype of a new Ring Artefact Tool<br>
   At the moment designed as standalone application and proof of concept.
   Will be in future version of the Preprocessing integrated.<br>
