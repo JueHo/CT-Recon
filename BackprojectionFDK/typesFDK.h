@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 /**********************************************************
@@ -14,7 +14,6 @@
 **********************************************************/
 #ifndef _TYPES_FDK_H
 #define _TYPES_FDK_H
-
 #include <string>
 #include <vector>
 
@@ -24,7 +23,7 @@ using namespace std;
 
 struct BackProjParam
 {
-	string projectName;
+	std::string projectName;
 	int   numProj;
 	int   imgWidth;
 	int   imgHeight;
@@ -44,14 +43,14 @@ struct BackProjParam
 	bool  useVolWin;
 	int   startIndex;
 	float startAngle;
-	string tomoDir;
-	string sinoPreProcDir;
-	string sinoLimPreProcDir;
-	string fileList;
-	string limFileList;
-	string sinoName;
-	string tomoName;
-	string outDataType;
+	std::string tomoDir;
+	std::string sinoPreProcDir;
+	std::string sinoLimPreProcDir;
+	std::string fileList;
+	std::string limFileList;
+	std::string sinoName;
+	std::string tomoName;
+	std::string outDataType;
 	int threadX;
 	int threadY;
 	int highAcc;
@@ -60,10 +59,10 @@ struct BackProjParam
 	int useFileList;
 	int useLimAngle;
     int viewDirection; //-ju-15-Apr-2015 add
-	vector<float> angleList;
-	vector<string> sinoList;
-	string sino32BlockFile;
-	string tomoBlockFile;
+	std::vector<float> angleList;
+	std::vector<std::string> sinoList;
+	std::string sino32BlockFile;
+	std::string tomoBlockFile;
 	int sino32BlockUse;			
 	int tomoBlockWrite;
 	int convertBlockInternal;
@@ -81,7 +80,7 @@ struct GraphicCardProp
 	int maxThrPerBlk;
 	int multProcCnt;
     //-ju-18-Nov-2013
-    string name;
+	std::string name;
     bool tccDriver;
 };
 
