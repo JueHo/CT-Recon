@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 /**********************************************************
@@ -29,7 +29,7 @@ enum FILTER_ERROR
 
 struct ErrorMessage
 {
-	char *msg;
+	const char *msg;
 	FILTER_ERROR err;
 };
 
