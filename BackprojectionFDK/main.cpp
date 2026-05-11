@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 /**********************************************************
@@ -16,25 +16,28 @@
 *
 *
 **********************************************************/
-#include "recon.h"
-#include "typesFDK.h"
-#include <windows.h>
-#include <cstdio>
+//#define _HAS_STD_BYTE 1
 #include <vector>
-#include <iostream>
-#include <cfloat>
+#include <algorithm>
+#include "recon.h"
 #include "parameter.h"
 #include "utils.h"
 #include <fstream>
+#include "typesFDK.h"
+#include <iostream>
+#include <windows.h>
+#include <cstdio>
+#include <cfloat>
 #include <cstdlib>
+#include <ctime>
 #include "convert.h"
+#include <cstddef>
+//#define _HAS_STD_BYTE 1
 #include <QtCore/QString>
 #include <QtCore/QSettings>
 #include <QtCore/QFile>
-
-#include <ctime>
-
-using namespace std;
+//#define Win32_LEAN_AND_MEAN
+//#undef _HAS_STD_BYTE
 
 #define MBYTE(bytes) bytes/(1024*1024) 
 #define KBYTE(bytes) bytes/(1024)
@@ -42,6 +45,8 @@ using namespace std;
 #include <LIMITS.H>
 
 extern const float gMaxFLT = FLT_MAX;
+
+using namespace std;
 
 
 int main(int argc, char* argv[])
@@ -98,6 +103,10 @@ int main(int argc, char* argv[])
 			cout << "Found " << gpuPropV.size() << " Cuda enabled devices.\n"; // Cuda enabled devices. Use device 2\n";
 			cudaSetDevice(0);
 		}
+		//-ju-1-Dec-2025
+		cout << "Total available global memory: " << gpuPropV[0].globalMem << " MByte.\n";
+		size_t free, total;
+		cudaMemGetInfo(&free, &total);
 	}
 	cout.flush();
 	// calculate chunks for gpu- and cpu-memory
