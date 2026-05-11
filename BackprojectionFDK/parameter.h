@@ -1,10 +1,9 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #ifndef _FDK_PARAMETER_H
 #define _FDK_PARAMETER_H
-
 #pragma warning(disable : 4996)
 
 #include <string>
@@ -12,7 +11,7 @@
 #include <vector>
 using namespace std;
 
-static char* Default_Parameter_File 	= ".\\parameters.desc";
+static const char* Default_Parameter_File 	= ".\\parameters.desc";
 
 static const char* CNT_PROJ				= "count_projections";
 static const char* START_IDX			= "start_index";
