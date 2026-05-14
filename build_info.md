@@ -4,7 +4,7 @@ Modules are build under Windows 10 with **MS Visual Studio 2017**
 compiled, linked and tested using the following libraries:
 + boost 1.69 (or newer): <https://www.boost.org>
 + opencv 4.5.x: <https://opencv.org>
-+ qt 5.15.x: <https://www.qt.io/download>
++ qt 5.15.x: (use Qt Maintenace Tool for installation - Online Installer of Qt.io and enable the view of of archive to see 5.x Qt versions)
 + qwt 6.1.2 (or newer): <https://sourceforge.net/projects/qwt/files/qwt/>
 + Cuda toolkit 10.1 (or newer): <https://developer.nvidia.com/cuda-10.1-download-archive-update2>
 + eigen 3.4: <https://eigen.tuxfamily.org>
