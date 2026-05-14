@@ -14,7 +14,7 @@ compiled, linked and tested using the following libraries:
 ***
 
 ### **Setup of environment:**
-The following variables need to be defined during comilation. Adapt according your libraries installation directories. They are needed during compilation.
+The following variables have to be defined before building the modules. Adapt the paths according your libraries installation directories.
 1. set QTDIR=C:\Qt\Qt-5.15.1
 2. set QWTDIR=D:\lib\qwt-6.1.2
 3. set BOOST_DIR=D:\lib\boost_1_69_0
@@ -23,7 +23,7 @@ The following variables need to be defined during comilation. Adapt according yo
 6. set OPENCV_DIR=D:\lib\OpenCV-4.5.4\opencv\build
 7. set AF_PATH=C:\Program Files\ArrayFire\v3
 
-QWT need to be compiled with installed Qt version. The liberies qwt.lib and qwtd.lib should be copied to %QTDIR%\lib. qwt.dll and qwtd.dll to %QTDIR%\bin
+QWT need to be compiled with the installed Qt version. The liberies qwt.lib and qwtd.lib should be copied to %QTDIR%\lib. qwt.dll and qwtd.dll to %QTDIR%\bin
 ***
 ### **Build:**
 Open recon_tools.sln in directory recon_tools with Visual Studio and build projects.
