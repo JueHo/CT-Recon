@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #ifndef FDK_GUI_H
@@ -26,7 +26,7 @@ public:
 	FDK_GUI(QWidget *parent = 0);
 	~FDK_GUI();
 public:
-	Ui::FDK_GUIClass GetUI()
+	Ui::FDK_GUIClass &GetUI()
 	{
 		return ui;
 	}
@@ -94,7 +94,7 @@ void DisplaySinograms(ImageType MaxVal)
 
 	int rowNo = ui.ListWidget_SinogramList->currentRow();
 	QString rowNoStr;
-	rowNoStr.sprintf("   #%d",rowNo);
+	rowNoStr.asprintf("   #%d",rowNo);
 	QList<QListWidgetItem*> wList = ui.ListWidget_SinogramList->selectedItems();
 	QByteArray imgData;
 	std::vector<ImageType> ucharTmp;
@@ -131,7 +131,7 @@ void DisplaySinograms(ImageType MaxVal)
 			m_imgDlg->setWindowTitle(winTitle); 
 
 			QPixmap *pix = new QPixmap(w,h);
-			m_imgDlg->GetImageArea()->setPixmap(pix->fromImage(image, 0));
+			m_imgDlg->GetImageArea()->setPixmap(pix->fromImage(image));
 
 			//-ju-24-June-2011 lim. max. size of label widget to image size
 			m_imgDlg->GetImageArea()->setMaximumHeight(h);
