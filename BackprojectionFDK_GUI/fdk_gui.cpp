@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #include "fdk_gui.h"
@@ -25,6 +25,8 @@
 #include <QtCore/QTextStream>
 //-ju-22-Jan-2019 debug
 #include <iostream>
+//-ju-Migration Qt 6.x
+#include <QRegExp>
 
 
 struct LANGUAGE_AND_CODE_PAGE 
@@ -590,7 +592,7 @@ void FDK_GUI::ReListLimAngleSinoFileList()
 void FDK_GUI::AddChildsToTree(int node, const QMap<QString,double> &fileDegree, QTreeWidget *toplevel)
 {
 	QString root;
-	root.sprintf("Segment-%02d:", node);
+	root.asprintf("Segment-%02d:", node);
 	QStringList list;
 
 
@@ -616,7 +618,7 @@ void FDK_GUI::AddChildsToTree(int node, const QMap<QString,double> &fileDegree, 
 		keyVal.append(filename);
 
 		QString val;
-		val.sprintf("%6.2f°", iter.value());
+		val.asprintf("%6.2fÂ°", iter.value());
 		keyVal.append(val);
 
 		child = new QTreeWidgetItem(keyVal);
@@ -635,7 +637,7 @@ void FDK_GUI::SetFilePattern(QString sinogramDir)
 	//if(!sinoDir.exists())
 	//{
 	//	QString txt;
-	//	txt.sprintf("Sinogram Directory: %s does not exist. Specify another!", sinoDir);
+	//	txt.asprintf("Sinogram Directory: %s does not exist. Specify another!", sinoDir);
 	//	ui.statusBar->showMessage(txt);
 	//	return;
 	//}
@@ -672,7 +674,7 @@ void FDK_GUI::SetFilePattern(QString sinogramDir)
 		return;
 	}
 	//ju- match and replace last 4 integer number in first part string
-	QString pattern = part[0].replace(QRegExp("[0-9]{4,4}$"), "****");
+	QString pattern = part[0].replace(QRegularExpression(QString("[0-9]{4,4}$")), QString("****"));
 	for(int i = 1; i < part.size(); i++)
 	{
 		pattern += ".";
@@ -851,7 +853,7 @@ void FDK_GUI::GetMPIVersion()
 		//VersionNumbers(major,subMajor,minor,subMinor);
 #ifdef _DEBUG_TEST
 		QString message;
-		message.sprintf("Version: %d.%d.%d.%d\n",major,subMajor,minor,subMinor);
+		message.asprintf("Version: %d.%d.%d.%d\n",major,subMajor,minor,subMinor);
 		QMessageBox::information(0, "Version MPI", message);
 #endif
 		if(major == 1)
@@ -1027,7 +1029,7 @@ void FDK_GUI::SaveProcessOutput()
 	if(!procOut.open(QIODevice::WriteOnly))
 	{
 		QString msg;
-		msg.sprintf("Can not create/write to File: %s", procOut.fileName().toStdString().c_str());
+		msg.asprintf("Can not create/write to File: %s", procOut.fileName().toStdString().c_str());
 		QMessageBox::warning(0, tr("Error creating/writing File"), msg);
 		return;
 	}
@@ -1091,7 +1093,7 @@ void FDK_GUI::ProcFinished()
 					ui.tabWidget->setEnabled(false);
 					ui.TabWidget_SinogramSettings->setEnabled(false);
 
-					executeFDKStr.sprintf("./FDKRecon.exe \"%s\"",
+					executeFDKStr.asprintf("./FDKRecon.exe \"%s\"",
 										  m_projectName.toStdString().c_str());
 					m_reconProc.setProcessChannelMode(QProcess::MergedChannels);
 					m_reconProc.start(executeFDKStr);
@@ -1102,7 +1104,7 @@ void FDK_GUI::ProcFinished()
 					ui.tabWidget->setEnabled(false);
 					ui.TabWidget_SinogramSettings->setEnabled(false);
 
-					executeFDKStr.sprintf("./FDKRecon.exe \"%s\"",
+					executeFDKStr.asprintf("./FDKRecon.exe \"%s\"",
 										  m_projectName.toStdString().c_str());
 					m_reconProc.setProcessChannelMode(QProcess::MergedChannels);
 					m_reconProc.start(executeFDKStr);
@@ -1318,14 +1320,14 @@ void FDK_GUI::RunReconstruction()
 		if(idx == 0) // micro CT
 		{
 			//-05-Sept-2012 check if executable exist
-			char *microCTexecutable_str = "./FDKRecon.exe";
+			const char *microCTexecutable_str = "./FDKRecon.exe";
 			QFile file(microCTexecutable_str);
 			if(file.exists())
 			{
 				//-ju-26-July-2011
 				ui.tabWidget->setEnabled(false);
 				ui.TabWidget_SinogramSettings->setEnabled(false);
-				executeFDKStr.sprintf("%s \"%s\"",
+				executeFDKStr.asprintf("%s \"%s\"",
 					                  microCTexecutable_str,
 									  m_projectName.toStdString().c_str());
 				m_reconProc.setProcessChannelMode(QProcess::MergedChannels);
@@ -1340,7 +1342,7 @@ void FDK_GUI::RunReconstruction()
 		if(idx == 1) // DETECT CT
 		{
 			//-05-Sept-2012 check if executable exist
-			char *detectCTexecutable_str = "./FDK_BlockIORec_DETECT_CT.exe";
+			const char *detectCTexecutable_str = "./FDK_BlockIORec_DETECT_CT.exe";
 			QFile file(detectCTexecutable_str);
 			if(file.exists())
 			{
@@ -1348,7 +1350,7 @@ void FDK_GUI::RunReconstruction()
 				ui.tabWidget->setEnabled(false);
 				ui.TabWidget_SinogramSettings->setEnabled(false);
 				//-05-Sept-2012 check if executable exist
-				executeFDKStr.sprintf("%s \"%s\"",
+				executeFDKStr.asprintf("%s \"%s\"",
 									  detectCTexecutable_str,
 									  m_projectName.toStdString().c_str());
 				m_reconProc.setProcessChannelMode(QProcess::MergedChannels);
@@ -1373,7 +1375,7 @@ void FDK_GUI::RunReconstruction()
 		}
 		*/
 		//-05-Sept-2012 check if executable exist
-		char *filterexecutable_str = "./FDKFilter.exe";
+		const char *filterexecutable_str = "./FDKFilter.exe";
 		QFile file(filterexecutable_str);
 		if(file.exists())
 		{
@@ -1382,9 +1384,9 @@ void FDK_GUI::RunReconstruction()
 			ui.TabWidget_SinogramSettings->setEnabled(false);
 			//QString executeMPIStr;
 			QString executeFilterStr;
-			//-ju-08-Nov-2011 use thread instead executeMPIStr.sprintf("\"%s\\mpiexec.exe\" -localonly %d WeightFilterFDK.exe \"%s\"",
+			//-ju-08-Nov-2011 use thread instead executeMPIStr.asprintf("\"%s\\mpiexec.exe\" -localonly %d WeightFilterFDK.exe \"%s\"",
 			//-05-Sept-2012 check if executable exist
-			executeFilterStr.sprintf("%s %s",
+			executeFilterStr.asprintf("%s %s",
 									 filterexecutable_str,
 								     //-ju-08-Nov-2011 mpi.toStdString().c_str(),
 								     //-ju-08-Nov-2011 ui.SBox_NumberOfMPIProcesses->value(),
@@ -1416,7 +1418,7 @@ void FDK_GUI::LimAngleRemoveSegment()
 	{
 		int index = ui.TreeWidget_LimAngleSeg->indexOfTopLevelItem(currentItem);
 		//QString msg;
-		//msg.sprintf("Index: %d",index);
+		//msg.asprintf("Index: %d",index);
 		//QMessageBox::information(0, "Toplevel", msg);
 		DelFromLimAngleSinoFileList(index);
 		ReListLimAngleSinoFileList();
@@ -1448,14 +1450,14 @@ void FDK_GUI::LimAngleAddSegment()
 	bool ok;
 	double startAngle = QInputDialog::getDouble(this,
 		tr("Start Angle"),
-		tr("Segment starts with angle in [°]:)"),
+		tr("Segment starts with angle in [Â°]:)"),
 		0.0,0.0,360.0,2,&ok);
 	if(!ok)
 		return;
 
 	double incrAngle = QInputDialog::getDouble(this,
 		tr("Increment Angle"),
-		tr("Angle Increment in [°]:)"),
+		tr("Angle Increment in [Â°]:)"),
 		1.0,0.01,180.0,2,&ok);
 	if(!ok)
 		return;
@@ -1476,7 +1478,7 @@ void FDK_GUI::LimAngleAddSegment()
 // prepocesssed limited angle sinogram directory selection
 void FDK_GUI::LimAnglePreProcDirSel()
 {
-	QFileDialog::Options mode = QFileDialog::Directory;
+	//QFileDialog::Options mode = QFileDialog::Directory;
 	m_LimAnglePreProcDir = 
 		QFileDialog::getExistingDirectory(0, 
 		tr("Select Directory for preprocessed Files"), 
@@ -1525,7 +1527,7 @@ void FDK_GUI::RemSelSinoFromList()
 
 void FDK_GUI::SinogramPreProcDir()
 {
-	QFileDialog::Options mode = QFileDialog::Directory;
+	//QFileDialog::Options mode = QFileDialog::Directory;
 	QString directory = ui.LEd_SinogramDirectory->text();
 	if(directory.isEmpty())
 	{
@@ -1626,7 +1628,7 @@ void FDK_GUI::SinoFileSelections()
 		}
 		ui.SBox_NumStartIndex->setValue(part[0][part[0].size()-1].digitValue());
 		//ju- match and replace last 4 integer number in first part string
-		QString pattern = part[0].replace(QRegExp("[0-9]{4,4}$"), "****");
+		QString pattern = part[0].replace(QRegularExpression("[0-9]{4,4}$"), "****");
 		for(int i = 1; i < part.size(); i++)
 		{
 			pattern += ".";
@@ -1646,7 +1648,7 @@ void FDK_GUI::SinoFileSelections()
 // selection of sinogram diretory
 void FDK_GUI::SinogramDir()
 {
-	QFileDialog::Options mode = QFileDialog::Directory;
+	//QFileDialog::Options mode = QFileDialog::Directory;
 	QString sinoDir = 
 		QFileDialog::getExistingDirectory(0, 
 		tr("Select Directory for Sinograms"), 
@@ -1682,7 +1684,7 @@ void FDK_GUI::SinogramDir()
 // selection of tomo directory
 void FDK_GUI::SetupTomoDir()
 {
-	QFileDialog::Options mode = QFileDialog::Directory;
+	//QFileDialog::Options mode = QFileDialog::Directory;
 	QString tomoDir = 
 		QFileDialog::getExistingDirectory(0, 
 		tr("Select Directory for Output Tomograms"), 
@@ -1760,7 +1762,7 @@ void FDK_GUI::LoadPathSetting()
 	{
 		/*-ju-28-Nov-2011 do not start option dialog box automatically
 		QString msg;
-		msg.sprintf("Can not read  path settings file: %s\n Create Settings File.", 
+		msg.asprintf("Can not read  path settings file: %s\n Create Settings File.", 
 					optFile.toStdString().c_str());
 		QMessageBox::warning(0, tr("Error opening File"), msg);
 		OptionFile.open(QIODevice::WriteOnly);
@@ -1823,7 +1825,7 @@ void FDK_GUI::SavePathSetting()
 		if(!OptionFile.open(QIODevice::WriteOnly))
 		{
 			QString msg;
-			msg.sprintf("Can not create/write to File: %s", OptionFile.fileName().toStdString().c_str());
+			msg.asprintf("Can not create/write to File: %s", OptionFile.fileName().toStdString().c_str());
 			QMessageBox::warning(0, tr("Error creating/writing File"), msg);
 			return;
 		}
@@ -1856,7 +1858,7 @@ void FDK_GUI::SetUseFileList()
 
 void FDK_GUI::SetupMPIPath()
 {
-	QFileDialog::Options mode = QFileDialog::Directory;
+	//QFileDialog::Options mode = QFileDialog::Directory;
 	QString mpiDir = 
 		QFileDialog::getExistingDirectory(0, 
 		tr("Select Directory of MPI executables"), 
@@ -1875,7 +1877,7 @@ void FDK_GUI::SetupMPIPath()
 
 void FDK_GUI::SetupDataTopPath()
 {
-	QFileDialog::Options mode = QFileDialog::Directory;
+	//QFileDialog::Options mode = QFileDialog::Directory;
 	QString dataDir = 
 		QFileDialog::getExistingDirectory(0, 
 		tr("Select Data Top Directory"), 
@@ -1961,7 +1963,7 @@ void FDK_GUI::CheckMaxVolRecSize()
 			ui.SBox_VolumeWidth->setValue(w);
 			ui.SBox_VolumeOriginX->setValue(x);
 			QString msg;
-			msg.sprintf("Volume selection (width) to large.\nResize selection.");
+			msg.asprintf("Volume selection (width) to large.\nResize selection.");
 			QMessageBox::warning(this,tr("Change Volume Selection"),msg);
 			m_volSelecTooBig = true;
 		}
@@ -1980,7 +1982,7 @@ void FDK_GUI::CheckMaxVolRecSize()
 			ui.SBox_VolumeHeight->setValue(h);
 			ui.SBox_VolumeOriginY->setValue(y);
 			QString msg;
-			msg.sprintf("Volume selection (height) to large.\nResize selection.");
+			msg.asprintf("Volume selection (height) to large.\nResize selection.");
 			QMessageBox::warning(this,tr("Change Volume Selection"),msg);
 			m_volSelecTooBig = true;
 		}
@@ -1999,7 +2001,7 @@ void FDK_GUI::CheckMaxVolRecSize()
 			ui.SBox_VolumeDepth->setValue(d);
 			ui.SBox_VolumeOriginZ->setValue(z);
 			QString msg;
-			msg.sprintf("Volume selection (depth) to large.\nResize selection.");
+			msg.asprintf("Volume selection (depth) to large.\nResize selection.");
 			QMessageBox::warning(this,tr("Change Volume Selection"),msg);
 			m_volSelecTooBig = true;
 		}
