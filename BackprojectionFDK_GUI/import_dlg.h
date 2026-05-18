@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #ifndef _IMPORT_DLG_H
@@ -16,7 +16,8 @@ public:
 	ImportDLG(QWidget *parent = 0);
 
 protected:
-	bool ImportDLG::eventFilter(QObject *targetCtrl, QEvent *event);
+	//bool ImportDLG::eventFilter(QObject* targetCtrl, QEvent* event);
+	bool eventFilter(QObject* targetCtrl, QEvent* event);
 
 public:
 	Ui::Dialog m_ui;
