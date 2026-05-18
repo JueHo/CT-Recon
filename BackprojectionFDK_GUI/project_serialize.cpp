@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #include "project_serialize.h"
@@ -50,7 +50,7 @@ bool ProjectSerialize::ReadFileList(QStringList &fileList,QString filename)
 	if(!SinoListFile.open(QIODevice::ReadOnly))
 	{
 		QString msg;
-		msg.sprintf("Can not read file list in File: %s", SinoListFile.fileName().toStdString().c_str());
+		msg.asprintf("Can not read file list in File: %s", SinoListFile.fileName().toStdString().c_str());
 		QMessageBox::warning(0, QObject::tr("Error Reading File"), msg);
 		return false;
 	}
@@ -79,7 +79,7 @@ bool ProjectSerialize::ReadSegmentedFileList(QVector<QMap<QString,double> > &lim
 	if(!SinoListFile.open(QIODevice::ReadOnly))
 	{
 		QString msg;
-		msg.sprintf("Can not read file list in File: %s", SinoListFile.fileName().toStdString().c_str());
+		msg.asprintf("Can not read file list in File: %s", SinoListFile.fileName().toStdString().c_str());
 		QMessageBox::warning(0, QObject::tr("Error Reading File"), msg);
 		return false;
 	}
@@ -101,7 +101,7 @@ bool ProjectSerialize::ReadSegmentedFileList(QVector<QMap<QString,double> > &lim
 	if(!isOK)
 	{
 		QString msg;
-		msg.sprintf("Angle value in >> %s << is invalid", textLine);
+		msg.asprintf("Angle value in >> %s << is invalid", textLine);
 		QMessageBox::warning(0, QObject::tr("Error Reading File"), msg);
 		return false;
 	}
@@ -121,7 +121,7 @@ bool ProjectSerialize::ReadSegmentedFileList(QVector<QMap<QString,double> > &lim
 			if(!isOK)
 			{
 				QString msg;
-				msg.sprintf("Angle value in >> %s << is invalid", textLine);
+				msg.asprintf("Angle value in >> %s << is invalid", textLine);
 				QMessageBox::warning(0, QObject::tr("Error Reading File"), msg);
 				return false;
 			}
@@ -137,7 +137,7 @@ bool ProjectSerialize::ReadSegmentedFileList(QVector<QMap<QString,double> > &lim
 			if(!isOK)
 			{
 				QString msg;
-				msg.sprintf("Angle value in >> %s << is invalid", textLine);
+				msg.asprintf("Angle value in >> %s << is invalid", textLine);
 				QMessageBox::warning(0, QObject::tr("Error Reading File"), msg);
 				return false;
 			}
@@ -161,7 +161,7 @@ bool ProjectSerialize::ReadASCIIFile(const QString& filename,
 	if(!asciiFile.open(QIODevice::ReadOnly))
 	{
 		QString msg;
-		msg.sprintf("Can not read project file: %s", 
+		msg.asprintf("Can not read project file: %s", 
 					filename.toStdString().c_str());
 		QMessageBox::warning(0, TR("Error opening File"), msg);
 		return false;
@@ -833,7 +833,7 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	if (!asciiFile.open(QIODevice::WriteOnly))
 	{
 		QString msg;
-		msg.sprintf("Can not create/write to File: %s", filename.toStdString().c_str());
+		msg.asprintf("Can not create/write to File: %s", filename.toStdString().c_str());
 		QMessageBox::warning(0, QObject::tr("Error creating/writing File"), msg);
 		return false;
 	}
@@ -842,7 +842,7 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	WriteASCIIHeader(outFile);
 	QString pl;
 	QString nl;
-	nl.sprintf("\n");
+	nl.asprintf("\n");
 	// write sinogram image parameters
 	outFile << nl;
 	WriteUnderLine(outFile);
@@ -860,30 +860,30 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	WriteUnderLine(outFile);						   
 	// print left aligned pad size 28
 	int fieldLength = 28;							   
-	pl.sprintf("%-*s = %-4d", fieldLength, IMG_WIDTH, m_ctrl.SBox_ImgWidth->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, IMG_WIDTH, m_ctrl.SBox_ImgWidth->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, IMG_HEIGHT, m_ctrl.SBox_ImgHeight->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, IMG_HEIGHT, m_ctrl.SBox_ImgHeight->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-6.3f", fieldLength, PIXEL_SIZE, m_ctrl.DSBOX_PixelSize->value());
+	pl.asprintf("%-*s = %-6.3f", fieldLength, PIXEL_SIZE, m_ctrl.DSBOX_PixelSize->value());
 	outFile << pl << nl;
 	QString dataTypeIn = GetDataType(m_ctrl.CBox_InDataFormat->currentText());
-	pl.sprintf("%-*s = %s", fieldLength, IN_DATATYPE, dataTypeIn.toStdString().c_str());
+	pl.asprintf("%-*s = %s", fieldLength, IN_DATATYPE, dataTypeIn.toStdString().c_str());
 	outFile << pl << nl;
 	// from options settings
 	if(m_ctrl.radioButton_fullAngleRecon->isChecked())
 	{
-		pl.sprintf("%-*s = %-4d", fieldLength, LIM_ANG_BPROJ, 0);
+		pl.asprintf("%-*s = %-4d", fieldLength, LIM_ANG_BPROJ, 0);
 		outFile << pl << nl;
 		if(!m_ctrl.checkBox_useFileList->isChecked())
 		{
-			pl.sprintf("%-*s = %-4d", fieldLength, USE_FILE_LIST, 0);
+			pl.asprintf("%-*s = %-4d", fieldLength, USE_FILE_LIST, 0);
 			outFile << pl << nl;
 			if(!ValidateTextField(m_ctrl.LEd_SinoNamePattern, TR("No sinogram name specified")))
 			{
 				outFile.setStatus(QTextStream::ReadCorruptData);
 				return false;
 			}
-			pl.sprintf("%-*s = %s", fieldLength, SINO_NAME,
+			pl.asprintf("%-*s = %s", fieldLength, SINO_NAME,
 				m_ctrl.LEd_SinoNamePattern->text().toStdString().c_str());
 			outFile << pl << nl;
 
@@ -892,7 +892,7 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 				outFile.setStatus(QTextStream::ReadCorruptData);
 				return false;
 			}
-			pl.sprintf("%-*s = %s", fieldLength, SINO_DIR, 
+			pl.asprintf("%-*s = %s", fieldLength, SINO_DIR, 
 				m_ctrl.LEd_SinogramDirectory->text().toStdString().c_str());
 			outFile << pl << nl;
 
@@ -903,21 +903,21 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 				outFile.setStatus(QTextStream::ReadCorruptData);
 				return false;
 			}
-			pl.sprintf("%-*s = %s", fieldLength, SINO32_DIR,
+			pl.asprintf("%-*s = %s", fieldLength, SINO32_DIR,
 				m_ctrl.LEd_PreprocSinoDirectory->text().toStdString().c_str());
 			outFile << pl << nl;
 
 		}
 		else // use file list
 		{
-			pl.sprintf("%-*s = %-4d", fieldLength, USE_FILE_LIST, 1);
+			pl.asprintf("%-*s = %-4d", fieldLength, USE_FILE_LIST, 1);
 			outFile << pl << nl;
 			if(!ValidateTextField(m_ctrl.LEd_PreprocSinoDirectory, TR("No pre-processed sinogram directory specified")))
 			{
 				outFile.setStatus(QTextStream::ReadCorruptData);
 				return false;
 			}
-			pl.sprintf("%-*s = %s", fieldLength, SINO32_DIR,
+			pl.asprintf("%-*s = %s", fieldLength, SINO32_DIR,
 				m_ctrl.LEd_PreprocSinoDirectory->text().toStdString().c_str());
 			outFile << pl << nl;
 
@@ -939,7 +939,7 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 			if(!SinoListFile.open(QIODevice::WriteOnly))
 			{
 				QString msg;
-				msg.sprintf("Can not create/write to File: %s", SinoListFile.fileName().toStdString().c_str());
+				msg.asprintf("Can not create/write to File: %s", SinoListFile.fileName().toStdString().c_str());
 				QMessageBox::warning(0, QObject::tr("Error creating/writing File"), msg);
 				return false;
 			}
@@ -958,16 +958,16 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	}
 	else // limited angle
 	{
-		pl.sprintf("%-*s = %-4d", fieldLength, LIM_ANG_BPROJ, 1);
+		pl.asprintf("%-*s = %-4d", fieldLength, LIM_ANG_BPROJ, 1);
 		outFile << pl << nl;
-		pl.sprintf("%-*s = %-4d", fieldLength, USE_FILE_LIST, 1);
+		pl.asprintf("%-*s = %-4d", fieldLength, USE_FILE_LIST, 1);
 		outFile << pl << nl;
 		if(!ValidateTextField(m_ctrl.LEd_LimAnglePreProcDir, TR("No pre-processed sinogram directory specified")))
 		{
 			outFile.setStatus(QTextStream::ReadCorruptData);
 			return false;
 		}
-		pl.sprintf("%-*s = %s", fieldLength, SINO32_DIR_LIM,
+		pl.asprintf("%-*s = %s", fieldLength, SINO32_DIR_LIM,
 			m_ctrl.LEd_LimAnglePreProcDir->text().toStdString().c_str());
 		outFile << pl << nl;
 		//read file list and write it to seperate file
@@ -988,7 +988,7 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 		if(!SinoListFile.open(QIODevice::WriteOnly))
 		{
 			QString msg;
-			msg.sprintf("Can not create/write to File: %s", SinoListFile.fileName().toStdString().c_str());
+			msg.asprintf("Can not create/write to File: %s", SinoListFile.fileName().toStdString().c_str());
 			QMessageBox::warning(0, QObject::tr("Error creating/writing File"), msg);
 			return false;
 		}
@@ -1015,7 +1015,7 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 			}
 		}
 	}
-	pl.sprintf("%-*s = %-4d", fieldLength, SINO32_BLOCK_WRITE, m_ctrl.CkBox_WriteToPreProcBlockFile->isChecked());
+	pl.asprintf("%-*s = %-4d", fieldLength, SINO32_BLOCK_WRITE, m_ctrl.CkBox_WriteToPreProcBlockFile->isChecked());
 	outFile << pl << nl;
 	WriteUnderLine(outFile);
 	outFile << nl;
@@ -1027,13 +1027,13 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	WriteCommentLine("  angle increment",outFile);
 	WriteCommentLine("  projections start at angle [default: 0 Grad]",outFile);
 	WriteUnderLine(outFile);
-	pl.sprintf("%-*s = %-4d", fieldLength, CNT_PROJ, m_ctrl.SBox_NumberOfProjections->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, CNT_PROJ, m_ctrl.SBox_NumberOfProjections->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, START_IDX, m_ctrl.SBox_NumStartIndex->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, START_IDX, m_ctrl.SBox_NumStartIndex->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-6.3f", fieldLength, ANGLE_INCR, m_ctrl.DSBox_AngleIncr->value());
+	pl.asprintf("%-*s = %-6.3f", fieldLength, ANGLE_INCR, m_ctrl.DSBox_AngleIncr->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-6.3f", fieldLength, START_ANGLE, m_ctrl.DSBox_SinoStartAtAngle->value());
+	pl.asprintf("%-*s = %-6.3f", fieldLength, START_ANGLE, m_ctrl.DSBox_SinoStartAtAngle->value());
 	outFile << pl << nl;
 	WriteUnderLine(outFile);
 	outFile << nl;
@@ -1050,27 +1050,27 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	WriteUnderLine(outFile);
 	if(m_ctrl.CBox_FilterType->currentText().toStdString() == "PhaseContrast")
 	{
-		pl.sprintf("%-*s = %s", fieldLength, APPLY_FILTER, "Ramp");
+		pl.asprintf("%-*s = %s", fieldLength, APPLY_FILTER, "Ramp");
 		outFile << pl << nl;
 		outFile << "use_phase_contrast_filter	 = 1" << nl;
 	}
 	else
 	{
-		pl.sprintf("%-*s = %s", fieldLength, APPLY_FILTER, m_ctrl.CBox_FilterType->currentText().toStdString().c_str());
+		pl.asprintf("%-*s = %s", fieldLength, APPLY_FILTER, m_ctrl.CBox_FilterType->currentText().toStdString().c_str());
 		outFile << pl << nl;
 		outFile << "use_phase_contrast_filter	 = 0" << nl;
 	}
     //-ju-14-Apr-2015
     /////////////////
-	pl.sprintf("%-*s = %-4d", fieldLength, VIEW_DIRECTION, m_ctrl.CBox_ViewDirection->currentIndex());
+	pl.asprintf("%-*s = %-4d", fieldLength, VIEW_DIRECTION, m_ctrl.CBox_ViewDirection->currentIndex());
 	outFile << pl << nl;
 
 
 	QString axisStr = m_ctrl.CBox_FlipSinogramImage->currentText();
 	int axis = GetFlipAxis(axisStr);
-	pl.sprintf("%-*s = %-4d", fieldLength, FLIP_IMAGE, axis);
+	pl.asprintf("%-*s = %-4d", fieldLength, FLIP_IMAGE, axis);
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-+6.3f", fieldLength, HORIZ_SHIFT, m_ctrl.DSBox_HorizontalShift->value());
+	pl.asprintf("%-*s = %-+6.3f", fieldLength, HORIZ_SHIFT, m_ctrl.DSBox_HorizontalShift->value());
 	outFile << pl << nl;
 	//-ju-18-June-2021 add tilt correction
 	//////////////////////////////////////
@@ -1082,16 +1082,16 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	{
 		outFile << "apply_tilted_axis_correction = 0" << nl;
 	}
-	pl.sprintf("%-*s = %-+10.8f", fieldLength, TILT_CORR_SLOPE_M, m_ctrl.doubleSpinBox_corrSlope_m->value());
+	pl.asprintf("%-*s = %-+10.8f", fieldLength, TILT_CORR_SLOPE_M, m_ctrl.doubleSpinBox_corrSlope_m->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-+10.8f", fieldLength, TILT_CORR_CONST_C, m_ctrl.doubleSpinBox_corrOffset_c->value());
+	pl.asprintf("%-*s = %-+10.8f", fieldLength, TILT_CORR_CONST_C, m_ctrl.doubleSpinBox_corrOffset_c->value());
 	outFile << pl << nl;
 	//////////////////////////////////////
-	pl.sprintf("%-*s = %-+6.3f", fieldLength, VERT_SHIFT, m_ctrl.DSBox_VerticalShift->value());
+	pl.asprintf("%-*s = %-+6.3f", fieldLength, VERT_SHIFT, m_ctrl.DSBox_VerticalShift->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-6.3f", fieldLength, DSD, m_ctrl.DSBox_DistSrcDetector->value());
+	pl.asprintf("%-*s = %-6.3f", fieldLength, DSD, m_ctrl.DSBox_DistSrcDetector->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-6.3f", fieldLength, DSO, m_ctrl.DSBox_DistSrcRotCentre->value());
+	pl.asprintf("%-*s = %-6.3f", fieldLength, DSO, m_ctrl.DSBox_DistSrcRotCentre->value());
 	outFile << pl << nl;
 	WriteUnderLine(outFile);
 	outFile << nl;
@@ -1114,27 +1114,27 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	WriteCommentLine("	write tomogram block files (not possible for batch) (0/1) [default: 1]",outFile);
 	WriteCommentLine("	write converted tomograms back to block file (0/1) [default: 0]",outFile);
 	WriteUnderLine(outFile);
-	pl.sprintf("%-*s = %-4d", fieldLength, PREVIEW_SCALE, m_ctrl.SBox_BinningFactor->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, PREVIEW_SCALE, m_ctrl.SBox_BinningFactor->value());
 	outFile << pl << nl;
 	if(m_ctrl.SBox_BinningFactor->value() == 1 && CheckMaxVolRecSize())
 	{
 		outFile.setStatus(QTextStream::ReadCorruptData);
 		return false;
 	}
-	pl.sprintf("%-*s = %-4d", fieldLength, VOL_X, m_ctrl.SBox_VolumeWidth->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, VOL_X, m_ctrl.SBox_VolumeWidth->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, VOL_Y, m_ctrl.SBox_VolumeHeight->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, VOL_Y, m_ctrl.SBox_VolumeHeight->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, VOL_Z, m_ctrl.SBox_VolumeDepth->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, VOL_Z, m_ctrl.SBox_VolumeDepth->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, W_ORIG_X, m_ctrl.SBox_VolumeOriginX->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, W_ORIG_X, m_ctrl.SBox_VolumeOriginX->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, W_ORIG_Y, m_ctrl.SBox_VolumeOriginY->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, W_ORIG_Y, m_ctrl.SBox_VolumeOriginY->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, W_ORIG_Z, m_ctrl.SBox_VolumeOriginZ->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, W_ORIG_Z, m_ctrl.SBox_VolumeOriginZ->value());
 	outFile << pl << nl;
 	QString dataTypeOut = GetDataType(m_ctrl.CBox_TomoOutDataFormat->currentText());
-	pl.sprintf("%-*s = %s", fieldLength, OUT_DATATYPE, dataTypeOut.toStdString().c_str());
+	pl.asprintf("%-*s = %s", fieldLength, OUT_DATATYPE, dataTypeOut.toStdString().c_str());
 	outFile << pl << nl;
 	if(!ValidateTextField(m_ctrl.LEd_TomoName, TR("No tomogram name specified")))
 	//if(!Validate(m_ctrl.CkBox_WriteBlockFile,m_ctrl.LEd_TomoName,TR("Neither tomogram name nor Block File write specified")))
@@ -1142,7 +1142,7 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 		outFile.setStatus(QTextStream::ReadCorruptData);
 		return false;
 	}
-	pl.sprintf("%-*s = %s",fieldLength, TOMO_NAME,m_ctrl.LEd_TomoName->text().toStdString().c_str());
+	pl.asprintf("%-*s = %s",fieldLength, TOMO_NAME,m_ctrl.LEd_TomoName->text().toStdString().c_str());
 	outFile << pl << nl;
 	if(!ValidateTextField(m_ctrl.LEd_TomoOutDir, TR("No tomogram output directory specified")))
 	//if(!Validate(m_ctrl.CkBox_WriteBlockFile,m_ctrl.LEd_TomoOutDir,TR("Neither tomogram output directory nor Block File write specified")))
@@ -1150,16 +1150,16 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 		outFile.setStatus(QTextStream::ReadCorruptData);
 		return false;
 	}
-	pl.sprintf("%-*s = %s",fieldLength, TOMO_DIR,m_ctrl.LEd_TomoOutDir->text().toStdString().c_str());
+	pl.asprintf("%-*s = %s",fieldLength, TOMO_DIR,m_ctrl.LEd_TomoOutDir->text().toStdString().c_str());
 	outFile << pl << nl;
 	int ctSystem = m_ctrl.CBox_CT_SystemSelection->currentIndex();
-	pl.sprintf("%-*s = %-4d", fieldLength, CT_SYSTEM, ctSystem);
+	pl.asprintf("%-*s = %-4d", fieldLength, CT_SYSTEM, ctSystem);
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, SINO32_BlOCK_USE, m_ctrl.CkBox_UsePreProcBlockFile->isChecked());
+	pl.asprintf("%-*s = %-4d", fieldLength, SINO32_BlOCK_USE, m_ctrl.CkBox_UsePreProcBlockFile->isChecked());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, TOMO_BLOCK_WRITE, m_ctrl.CkBox_WriteBlockFile->isChecked());
+	pl.asprintf("%-*s = %-4d", fieldLength, TOMO_BLOCK_WRITE, m_ctrl.CkBox_WriteBlockFile->isChecked());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, CONV_Block_INTERNAL, m_ctrl.CkBox_StoreConvTomoBlockFile->isChecked());
+	pl.asprintf("%-*s = %-4d", fieldLength, CONV_Block_INTERNAL, m_ctrl.CkBox_StoreConvTomoBlockFile->isChecked());
 	outFile << pl << nl;
 	WriteUnderLine(outFile);
 	outFile << nl;
@@ -1174,27 +1174,27 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	WriteCommentLine("	Number of GPUs used [default: 1]",outFile);
 	WriteCommentLine("  Bilinear Interpolation fast/accurate [default: 1 = fast]", outFile);
 	WriteUnderLine(outFile);
-	pl.sprintf("%-*s = %-+6.3f", fieldLength, CPU_MEM_USE, m_ctrl.DSBox_CPUMemUsage->value());
+	pl.asprintf("%-*s = %-+6.3f", fieldLength, CPU_MEM_USE, m_ctrl.DSBox_CPUMemUsage->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-+6.3f", fieldLength, GPU_MEM_USE, m_ctrl.DSBox_GPUMemUsage->value());
+	pl.asprintf("%-*s = %-+6.3f", fieldLength, GPU_MEM_USE, m_ctrl.DSBox_GPUMemUsage->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, THREADS_X, m_ctrl.SBox_GPUThreadsX->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, THREADS_X, m_ctrl.SBox_GPUThreadsX->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, THREADS_Y, m_ctrl.SBox_GPUThreadsY->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, THREADS_Y, m_ctrl.SBox_GPUThreadsY->value());
 	outFile << pl << nl;
-	//pl.sprintf("%-*s = %s", fieldLength, GPU_COMP_VERS,
+	//pl.asprintf("%-*s = %s", fieldLength, GPU_COMP_VERS,
 	//		   m_ctrl.CBox_GPUCompaVers->currentText().toStdString().c_str());
 	//outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, NUM_GPUS_USE, m_ctrl.SBox_UseNumGPUs->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, NUM_GPUS_USE, m_ctrl.SBox_UseNumGPUs->value());
 	outFile << pl << nl;
 	if (m_ctrl.radioButton_fast->isChecked())
 	{
-		pl.sprintf("%-*s = %-4d", fieldLength, HI_ACC, 0);
+		pl.asprintf("%-*s = %-4d", fieldLength, HI_ACC, 0);
 		outFile << pl << nl;
 	}
 	else
 	{
-		pl.sprintf("%-*s = %-4d", fieldLength, HI_ACC, 1);
+		pl.asprintf("%-*s = %-4d", fieldLength, HI_ACC, 1);
 		outFile << pl << nl;
 	}
 	WriteUnderLine(outFile);
@@ -1213,18 +1213,18 @@ bool ProjectSerialize::WriteASCIIFile(const QString &filename)
 	WriteCommentLine("	Do processing of weighting and filtering [default: on]",outFile);
 	WriteCommentLine("	Do backprojection processing [default: on]",outFile);
 	WriteUnderLine(outFile);
-	//pl.sprintf("%-*s = %-4d", fieldLength, USE_MPI, m_ctrl.CkBox_UseMPI->isChecked());
+	//pl.asprintf("%-*s = %-4d", fieldLength, USE_MPI, m_ctrl.CkBox_UseMPI->isChecked());
 	//outFile << pl << nl;
 	//QString mpiVers = m_ctrl.CBox_MPIVersion->currentText();
-	//pl.sprintf("%-*s = %s", fieldLength, MPI_VERSION, mpiVers.toStdString().c_str());
+	//pl.asprintf("%-*s = %s", fieldLength, MPI_VERSION, mpiVers.toStdString().c_str());
 	//outFile << pl << nl;
-	//pl.sprintf("%-*s = %-4d", fieldLength, NUM_MPI_PROC, m_ctrl.SBox_NumberOfMPIProcesses->value());
+	//pl.asprintf("%-*s = %-4d", fieldLength, NUM_MPI_PROC, m_ctrl.SBox_NumberOfMPIProcesses->value());
 	//outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, NUM_THREADS, m_ctrl.SBox_NumberOfMPIProcesses->value());
+	pl.asprintf("%-*s = %-4d", fieldLength, NUM_THREADS, m_ctrl.SBox_NumberOfMPIProcesses->value());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, DO_WEIGHT_FILTER, m_ctrl.CkBox_WeightFilter->isChecked());
+	pl.asprintf("%-*s = %-4d", fieldLength, DO_WEIGHT_FILTER, m_ctrl.CkBox_WeightFilter->isChecked());
 	outFile << pl << nl;
-	pl.sprintf("%-*s = %-4d", fieldLength, DO_BACK_PROJECT, m_ctrl.CkBox_Backprojection->isChecked());
+	pl.asprintf("%-*s = %-4d", fieldLength, DO_BACK_PROJECT, m_ctrl.CkBox_Backprojection->isChecked());
 	outFile << pl << nl;
 	WriteUnderLine(outFile);						   
 
@@ -1247,14 +1247,14 @@ void ProjectSerialize::WriteASCIIHeader(QTextStream &outFile)
 void ProjectSerialize::WriteCommentLine(const char *msg, QTextStream &outFile)
 {
 	QString str;
-	str.sprintf("# %s\n", msg);
+	str.asprintf("# %s\n", msg);
 	outFile << str;
 }
 
 void ProjectSerialize::WriteUnderLine(QTextStream &outFile)
 {
 	QString str;
-	str.sprintf("###############################################################################\n");
+	str.asprintf("###############################################################################\n");
 	outFile << str;
 
 }
@@ -1349,14 +1349,14 @@ bool ProjectSerialize::Validate(QCheckBox *chkBox, QLineEdit *textField, QString
 void ProjectSerialize::PrintParameterError(const char* parameter)
 {
 	QString msg;
-	msg.sprintf("Error reading parameter >> %s <<",parameter);
+	msg.asprintf("Error reading parameter >> %s <<",parameter);
 	QMessageBox::warning(0,TR("Error reading parameter"),msg);
 }
 
 void ProjectSerialize::AddChildsToTree(int node, const QMap<QString,double> &fileDegree, QTreeWidget *toplevel)
 {
 	QString root;
-	root.sprintf("Segment-%02d:", node);
+	root.asprintf("Segment-%02d:", node);
 	QStringList list;
 
 
@@ -1382,7 +1382,7 @@ void ProjectSerialize::AddChildsToTree(int node, const QMap<QString,double> &fil
 		keyVal.append(filename);
 
 		QString val;
-		val.sprintf("%6.2f°", iter.value());
+		val.asprintf("%6.2fÂ°", iter.value());
 		keyVal.append(val);
 
 		child = new QTreeWidgetItem(keyVal);
@@ -1418,7 +1418,7 @@ bool ProjectSerialize::CheckMaxVolRecSize()
 			m_ctrl.SBox_VolumeWidth->setValue(w);
 			m_ctrl.SBox_VolumeOriginX->setValue(x);
 			QString msg;
-			msg.sprintf("Volume selection (width) to large.\nResize selection.");
+			msg.asprintf("Volume selection (width) to large.\nResize selection.");
 			QMessageBox::warning(0,TR("Change Volume Selection"),msg);
 			flag = true;
 		}
@@ -1437,7 +1437,7 @@ bool ProjectSerialize::CheckMaxVolRecSize()
 			m_ctrl.SBox_VolumeHeight->setValue(h);
 			m_ctrl.SBox_VolumeOriginY->setValue(y);
 			QString msg;
-			msg.sprintf("Volume selection (height) to large.\nResize selection.");
+			msg.asprintf("Volume selection (height) to large.\nResize selection.");
 			QMessageBox::warning(0,TR("Change Volume Selection"),msg);
 			flag = true;
 		}
@@ -1456,7 +1456,7 @@ bool ProjectSerialize::CheckMaxVolRecSize()
 			m_ctrl.SBox_VolumeDepth->setValue(d);
 			m_ctrl.SBox_VolumeOriginZ->setValue(z);
 			QString msg;
-			msg.sprintf("Volume selection (depth) to large.\nResize selection.");
+			msg.asprintf("Volume selection (depth) to large.\nResize selection.");
 			QMessageBox::warning(0,TR("Change Volume Selection"),msg);
 			flag = true;
 		}
