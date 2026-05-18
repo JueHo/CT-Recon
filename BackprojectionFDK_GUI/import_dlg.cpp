@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #include "import_dlg.h"
@@ -82,7 +82,7 @@ void ImportDLG::GetVolumeFile()
 		QMessageBox::warning(this,tr("Error Open File"),msg);
 		return;
 	}
-	m_completeBaseInputName = file.remove(QRegExp("\\.pru$"));
+	m_completeBaseInputName = file.remove(QRegularExpression("\\.pru$"));
 	m_ui.lineEdit_VolumeFile->clear();
 	m_ui.lineEdit_VolumeFile->setText(m_completeBaseInputName);
 	m_temDir = fInfo.absolutePath();
@@ -90,7 +90,7 @@ void ImportDLG::GetVolumeFile()
 
 void ImportDLG::GetSinoOutDir()
 {
-	QFileDialog::Options mode = QFileDialog::Directory;
+	//QFileDialog::Options mode = QFileDialog::Directory;
 	m_outputDir = 
 		QFileDialog::getExistingDirectory(0, 
 		tr("Select Directory for Output Sinograms"), 
