@@ -1,9 +1,12 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #ifndef _RAWFILE_2_IMAGE_H
 #define _RAWFILE_2_IMAGE_H
+
+#include <QFileInfo>
+#include <QMessageBox>
 
 
 inline float ROUND(float x)
