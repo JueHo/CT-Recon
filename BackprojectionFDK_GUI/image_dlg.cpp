@@ -1,5 +1,5 @@
 /**
-*  Copyright © [2011], Empa, Juergen Hofmann
+*  Copyright Â© [2011], Empa, Juergen Hofmann
 */
 
 #include "image_dlg.h"
@@ -43,7 +43,7 @@ bool ImageDLG::eventFilter(QObject *targetCtrl, QEvent *event)
 	if(targetCtrl == ui.DLG_ImageArea && ui.checkBox_keepSelection->isChecked() && GetImageNumber() != m_imageNo)
 	{
 		m_imageNo = GetImageNumber();
-		QPixmap pix((*(ui.DLG_ImageArea->pixmap())));
+		QPixmap pix(((ui.DLG_ImageArea->pixmap())));
 		m_pix = pix;
 		QPainter paint(&pix);
 		QPen pen(Qt::blue,1);
@@ -108,7 +108,7 @@ bool ImageDLG::eventFilter(QObject *targetCtrl, QEvent *event)
 				if(GetImageNumber() != m_imageNo || m_zoomModified)
 				{
 					m_imageNo = GetImageNumber();
-					QPixmap pix((*(ui.DLG_ImageArea->pixmap())));
+					QPixmap pix(((ui.DLG_ImageArea->pixmap())));
 					m_pix = pix;
 					m_zoomModified = false;
 				}
